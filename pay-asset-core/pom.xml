@@ -52,7 +52,7 @@
         <!-- pay-asset -->
         <dependency>
             <groupId>com.pay</groupId>
-            <artifactId>pay-api-asset</artifactId>
+            <artifactId>pay-asset-client</artifactId>
         </dependency>
 
         <dependency>

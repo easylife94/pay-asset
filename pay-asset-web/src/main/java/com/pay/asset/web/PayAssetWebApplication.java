@@ -1,4 +1,4 @@
-package com.pay.web;
+package com.pay.asset.web;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;

@@ -1,4 +1,4 @@
-package com.pay.web;
+package com.pay.asset.web;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,7 +1,7 @@
 package com.pay.asset.core.rabbit;
 
 import com.pay.asset.client.constants.PayAssetMessageQueueNames;
-import com.pay.asset.client.dto.TradeStatisticsMessageDTO;
+import com.pay.asset.client.dto.async.TradeStatisticsMessageDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;

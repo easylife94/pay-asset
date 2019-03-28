@@ -21,7 +21,14 @@ public class RabbitMqReceiver {
     public void tradeCreate(TradeStatisticsMessageDTO tradeStatisticsMessageDTO) {
         try {
             log.info("收到交易统计消息：{}", tradeStatisticsMessageDTO);
-            //1.数据统计
+            //1.商户交易数据统计
+            //1.1小时数据统计
+
+
+            //1.2日数据统计
+            //1.3月数据统计
+            //1.4年数据统计
+
         } catch (Exception e) {
             e.printStackTrace();
             log.error("交易创建消息处理异常，消息内容:{}，异常：{}", tradeStatisticsMessageDTO, e.getMessage());

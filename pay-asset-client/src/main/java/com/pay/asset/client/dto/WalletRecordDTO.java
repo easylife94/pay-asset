@@ -1,12 +1,10 @@
 package com.pay.asset.client.dto;
 
 import com.pay.asset.client.constants.WalletOwnRoleEnum;
+import com.pay.asset.client.constants.WalletRecordOrderStatusEnum;
 import com.pay.asset.client.constants.WalletRecordOrderTypeEnum;
-import com.pay.asset.client.constants.WalletRecordPaymentTypeEnum;
-import com.pay.asset.client.constants.WalletRecordTradeTypeEnum;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -37,6 +35,11 @@ public class WalletRecordDTO {
      * 关联订单号
      */
     private String orderNumber;
+
+    /**
+     * 订单状态
+     */
+    private WalletRecordOrderStatusEnum orderStatus;
 
     /**
      * 子记录

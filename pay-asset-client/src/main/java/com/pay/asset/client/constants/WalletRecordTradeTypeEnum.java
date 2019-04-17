@@ -1,7 +1,7 @@
 package com.pay.asset.client.constants;
 
 /**
- * 钱包流水交易类型
+ * 钱包记录交易类型
  *
  * @author chenwei
  * @date 2019/4/16 17:24

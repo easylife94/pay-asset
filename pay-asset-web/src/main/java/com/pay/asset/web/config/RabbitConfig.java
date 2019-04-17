@@ -34,4 +34,14 @@ public class RabbitConfig {
     public Queue tradeStatisticsQueue() {
         return new Queue(PayAssetMessageQueueNames.QUEUE_TRADE_STATISTICS);
     }
+
+    /**
+     * 钱包记录队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue walletRecordQueue() {
+        return new Queue(PayAssetMessageQueueNames.QUEUE_WALLET_RECORD);
+    }
 }

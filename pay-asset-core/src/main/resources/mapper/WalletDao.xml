@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pay.asset.core.dao.WalletDao">
+    <resultMap id="BaseResultMap" type="com.pay.asset.client.model.WalletDO">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_update" jdbcType="TIMESTAMP" property="gmtUpdate"/>
+        <result column="is_deleted" jdbcType="BIT" property="isDeleted"/>
+        <result column="own_number" jdbcType="VARCHAR" property="ownNumber"/>
+        <result column="own_role" jdbcType="VARCHAR" property="ownRole"/>
+        <result column="balance_total" jdbcType="DECIMAL" property="balanceTotal"/>
+        <result column="balance_usable" jdbcType="DECIMAL" property="balanceUsable"/>
+        <result column="balance_frozen" jdbcType="DECIMAL" property="balanceFrozen"/>
+        <result column="income_total" jdbcType="DECIMAL" property="incomeTotal"/>
+        <result column="expenditure_total" jdbcType="DECIMAL" property="expenditureTotal"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id,
+        gmt_create,
+        gmt_update,
+        is_deleted,
+        own_number,
+        own_role,
+        balance_total,
+        balance_usable,
+        balance_frozen,
+        income_total,
+        expenditure_total
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from wallet
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from wallet
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.pay.asset.client.model.WalletDO">
+        insert into wallet (id, gmt_create, gmt_update, is_deleted,
+                            own_number, own_role, balance_total, balance_usable, balance_frozen, income_total,
+                            expenditure_total)
+        values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtUpdate,jdbcType=TIMESTAMP},
+                #{isDeleted,jdbcType=BIT},
+                #{ownNumber,jdbcType=VARCHAR}, #{ownRole,jdbcType=VARCHAR}, #{balanceTotal,jdbcType=DECIMAL},
+                #{balanceUsable,jdbcType=DECIMAL},
+                #{balanceFrozen,jdbcType=DECIMAL}, #{incomeTotal,jdbcType=DECIMAL},
+                #{expenditureTotal,jdbcType=DECIMAL})
+    </insert>
+    <insert id="insertSelective" parameterType="com.pay.asset.client.model.WalletDO">
+        insert into wallet
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="gmtCreate != null">
+                gmt_create,
+            </if>
+            <if test="gmtUpdate != null">
+                gmt_update,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+            <if test="ownNumber != null">
+                own_number,
+            </if>
+            <if test="ownRole != null">
+                own_role,
+            </if>
+            <if test="balanceTotal != null">
+                balance_total,
+            </if>
+            <if test="balanceUsable != null">
+                balance_usable,
+            </if>
+            <if test="balanceFrozen != null">
+                balance_frozen,
+            </if>
+            <if test="incomeTotal != null">
+                income_total,
+            </if>
+            <if test="expenditureTotal != null">
+                expenditure_total,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="gmtCreate != null">
+                #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtUpdate != null">
+                #{gmtUpdate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=BIT},
+            </if>
+            <if test="ownNumber != null">
+                #{ownNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="ownRole != null">
+                #{ownRole,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceTotal != null">
+                #{balanceTotal,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceUsable != null">
+                #{balanceUsable,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceFrozen != null">
+                #{balanceFrozen,jdbcType=DECIMAL},
+            </if>
+            <if test="incomeTotal != null">
+                #{incomeTotal,jdbcType=DECIMAL},
+            </if>
+            <if test="expenditureTotal != null">
+                #{expenditureTotal,jdbcType=DECIMAL},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.pay.asset.client.model.WalletDO">
+        update wallet
+        <set>
+            <if test="gmtCreate != null">
+                gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtUpdate != null">
+                gmt_update = #{gmtUpdate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=BIT},
+            </if>
+            <if test="ownNumber != null">
+                own_number = #{ownNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="ownRole != null">
+                own_role = #{ownRole,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceTotal != null">
+                balance_total = #{balanceTotal,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceUsable != null">
+                balance_usable = #{balanceUsable,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceFrozen != null">
+                balance_frozen = #{balanceFrozen,jdbcType=DECIMAL},
+            </if>
+            <if test="incomeTotal != null">
+                income_total = #{incomeTotal,jdbcType=DECIMAL},
+            </if>
+            <if test="expenditureTotal != null">
+                expenditure_total= #{expenditureTotal,jdbcType=DECIMAL},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.pay.asset.client.model.WalletDO">
+        update wallet
+        set
+            gmt_create        = #{gmtCreate,jdbcType=TIMESTAMP},
+            gmt_update        = #{gmtUpdate,jdbcType=TIMESTAMP},
+            is_deleted        = #{isDeleted,jdbcType=BIT},
+            own_number        = #{ownNumber,jdbcType=VARCHAR},
+            own_role          = #{ownRole,jdbcType=VARCHAR},
+            balance_total     = #{balanceTotal,jdbcType=DECIMAL},
+            balance_usable    = #{balanceUsable,jdbcType=DECIMAL},
+            balance_frozen    = #{balanceFrozen,jdbcType=DECIMAL},
+            income_total      = #{incomeTotal,jdbcType=DECIMAL},
+            expenditure_total = #{expenditureTotal,jdbcType=DECIMAL}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+
+    <select id="selectByOwner" resultType="com.pay.asset.client.model.WalletDO">
+        select
+        <include refid="Base_Column_List"/>
+        from wallet
+        where own_number = #{ownNumber,jdbcType=VARCHAR} and own_role = #{ownRole,jdbcType=VARCHAR}
+    </select>
+</mapper>

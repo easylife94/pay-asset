@@ -7,6 +7,11 @@ package com.pay.asset.client.constants;
 public enum WalletRecordOrderStatusEnum {
 
     /**
+     * 已下单
+     */
+    ORDER,
+
+    /**
      * 已支付
      */
     PAYMENT,

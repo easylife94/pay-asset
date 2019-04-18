@@ -22,6 +22,22 @@ public enum WalletRecordPaymentTypeEnum {
      * 冻结
      */
     FROZEN,
+
+    /**
+     * 解冻
+     */
+    UNFROZEN,
+
+    /**
+     * 收入冻结
+     */
+    IN_FROZEN,
+
+    /**
+     * 支出解冻
+     */
+    OUT_UNFROZEN,
+
     ;
 
 

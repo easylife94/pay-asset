@@ -8,7 +8,7 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication(scanBasePackages = {"com.pay.*"})
-@MapperScan("com.pay.api.core.dao")
+@MapperScan("com.pay.asset.core.dao")
 @EnableEurekaClient
 @EnableFeignClients(basePackages = {"com.pay.*"})
 @EnableCaching

@@ -16,42 +16,46 @@ public enum WalletRecordTradeTypeEnum {
     MEMBER_RECHARGE,
 
     /**
-     * 会员提现税费
-     */
-    MEMBER_WITHDRAW_TAX,
-
-    /**
-     * 会员提现服务费
-     */
-    MEMBER_WITHDRAW_SERVICE_FEE,
-
-    /**
      * 代理商交易服务费分润
      */
-    AGENT_TRADE_SERVICE_PROFIT,
+    TRADE_SERVICE_PROFIT,
 
     /**
-     * 代理商交易通道分润
+     * 交易通道分润
      */
-    AGENT_TRADE_CHANNEL_PROFIT,
-
+    TRADE_CHANNEL_PROFIT,
 
 
     ///////////支出
     /**
-     * 会员交易通道成本费
+     * 交易通道成本费
      */
-    MEMBER_TRADE_CHANNEL_FEE,
+    TRADE_CHANNEL_FEE,
 
     /**
-     * 会员交易服务费
+     * 交易服务费
      */
-    MEMBER_TRADE_SERVICE_FEE,
+    TRADE_SERVICE_FEE,
+
+    /**
+     * 提现解冻（实际支出）
+     */
+    WITHDRAW_UNFROZEN,
+
+    /**
+     * 提现冻结（未实际支出）
+     */
+    WITHDRAW_FROZEN,
 
     /**
      * 提现税费
      */
     WITHDRAW_TAX,
+
+    /**
+     * 提现服务费
+     */
+    WITHDRAW_SERVICE_FEE,
 
 
     ;

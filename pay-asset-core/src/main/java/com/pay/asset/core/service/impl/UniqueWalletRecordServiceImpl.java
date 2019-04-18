@@ -16,6 +16,6 @@ public class UniqueWalletRecordServiceImpl implements IUniqueWalletRecordService
 
     @Override
     public Boolean existed(WalletRecordOrderTypeEnum orderType, String orderNumber, WalletRecordOrderStatusEnum orderStatus) {
-        return null;
+        return false;
     }
 }

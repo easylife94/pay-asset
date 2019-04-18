@@ -9,7 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pay-api-web</artifactId>
+    <artifactId>pay-asset-web</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>pay-asset-web</name>
     <description>Demo project for Spring Boot</description>

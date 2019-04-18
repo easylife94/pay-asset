@@ -137,23 +137,76 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
         walletRecordDTO.setOrderNumber("TEST-" + System.currentTimeMillis());
         walletRecordDTO.setOrderStatus(WalletRecordOrderStatusEnum.CHECK);
         walletRecordDTO.setOrderType(WalletRecordOrderTypeEnum.TRADE_ORDER);
-        walletRecordDTO.setOwnNumber("A00001");
-        walletRecordDTO.setOwnRole(WalletOwnRoleEnum.MEMBER);
+        walletRecordDTO.setOwnNumber("A10000");
+        walletRecordDTO.setOwnRole(WalletOwnRoleEnum.AGENT);
         List<WalletSubRecordDTO> recordList = new ArrayList<>();
 
         //提现
         WalletSubRecordDTO record1 = new WalletSubRecordDTO();
-        record1.setAmount(new BigDecimal("250"));
+        record1.setAmount(new BigDecimal("2"));
+        record1.setPaymentType(WalletRecordPaymentTypeEnum.IN);
+        record1.setTradeType(WalletRecordTradeTypeEnum.TRADE_SERVICE_PROFIT);
+
+        WalletSubRecordDTO record2 = new WalletSubRecordDTO();
+        record2.setAmount(new BigDecimal("2"));
+        record2.setPaymentType(WalletRecordPaymentTypeEnum.IN);
+        record2.setTradeType(WalletRecordTradeTypeEnum.TRADE_CHANNEL_PROFIT);
+
+        recordList.add(record1);
+        recordList.add(record2);
+        walletRecordDTO.setSubRecords(recordList);
+        walletService.walletRecord(walletRecordDTO);
+    }
+
+    /**
+     * 代理商提现下单
+     */
+    @Test
+    public void agentWalletWithdrawOrderRecordTest() {
+        WalletRecordDTO walletRecordDTO = new WalletRecordDTO();
+        walletRecordDTO.setOrderNumber("TEST-" + System.currentTimeMillis());
+        walletRecordDTO.setOrderStatus(WalletRecordOrderStatusEnum.ORDER);
+        walletRecordDTO.setOrderType(WalletRecordOrderTypeEnum.WITHDRAW_ORDER);
+        walletRecordDTO.setOwnNumber("A10000");
+        walletRecordDTO.setOwnRole(WalletOwnRoleEnum.AGENT);
+        List<WalletSubRecordDTO> recordList = new ArrayList<>();
+
+        //提现
+        WalletSubRecordDTO record1 = new WalletSubRecordDTO();
+        record1.setAmount(new BigDecimal("2"));
+        record1.setPaymentType(WalletRecordPaymentTypeEnum.FROZEN);
+        record1.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_FROZEN);
+        recordList.add(record1);
+        walletRecordDTO.setSubRecords(recordList);
+        walletService.walletRecord(walletRecordDTO);
+    }
+
+    /**
+     * 代理商提现成功
+     */
+    @Test
+    public void agentWalletWithdrawPaymentRecordTest() {
+        WalletRecordDTO walletRecordDTO = new WalletRecordDTO();
+        walletRecordDTO.setOrderNumber("TEST-" + System.currentTimeMillis());
+        walletRecordDTO.setOrderStatus(WalletRecordOrderStatusEnum.PAYMENT);
+        walletRecordDTO.setOrderType(WalletRecordOrderTypeEnum.WITHDRAW_ORDER);
+        walletRecordDTO.setOwnNumber("A10000");
+        walletRecordDTO.setOwnRole(WalletOwnRoleEnum.AGENT);
+        List<WalletSubRecordDTO> recordList = new ArrayList<>();
+
+        //提现
+        WalletSubRecordDTO record1 = new WalletSubRecordDTO();
+        record1.setAmount(new BigDecimal("2"));
         record1.setPaymentType(WalletRecordPaymentTypeEnum.OUT_UNFROZEN);
         record1.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_UNFROZEN);
 
         WalletSubRecordDTO record2 = new WalletSubRecordDTO();
-        record2.setAmount(new BigDecimal("10"));
+        record2.setAmount(new BigDecimal("0.01"));
         record2.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
         record2.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_SERVICE_FEE);
 
         WalletSubRecordDTO record3 = new WalletSubRecordDTO();
-        record3.setAmount(new BigDecimal("10"));
+        record3.setAmount(new BigDecimal("0.01"));
         record3.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
         record3.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_TAX);
         recordList.add(record1);

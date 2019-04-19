@@ -132,7 +132,7 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
      * 结算分润
      */
     @Test
-    public void memberWalletCheckRecordTest() {
+    public void agentWalletCheckRecordTest() {
         WalletRecordDTO walletRecordDTO = new WalletRecordDTO();
         walletRecordDTO.setOrderNumber("TEST-" + System.currentTimeMillis());
         walletRecordDTO.setOrderStatus(WalletRecordOrderStatusEnum.CHECK);
@@ -215,4 +215,35 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
         walletRecordDTO.setSubRecords(recordList);
         walletService.walletRecord(walletRecordDTO);
     }
+
+    /**
+     * 交易去重
+     */
+    @Test
+    public void uniqueWalletTradeRecordTest() {
+        String orderNumber = "TEST-" + System.currentTimeMillis();
+        for (int i = 0; i < 2;i++ ) {
+            WalletRecordDTO walletRecordDTO = new WalletRecordDTO();
+            walletRecordDTO.setOrderNumber(orderNumber);
+            walletRecordDTO.setOrderStatus(WalletRecordOrderStatusEnum.PAYMENT);
+            walletRecordDTO.setOrderType(WalletRecordOrderTypeEnum.TRADE_ORDER);
+            walletRecordDTO.setOwnNumber("A00001");
+            walletRecordDTO.setOwnRole(WalletOwnRoleEnum.MEMBER);
+            List<WalletSubRecordDTO> recordList = new ArrayList<>();
+            WalletSubRecordDTO record1 = new WalletSubRecordDTO();
+            record1.setAmount(new BigDecimal("2.00"));
+            record1.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
+            record1.setTradeType(WalletRecordTradeTypeEnum.TRADE_SERVICE_FEE);
+
+            WalletSubRecordDTO record2 = new WalletSubRecordDTO();
+            record2.setAmount(new BigDecimal("2.00"));
+            record2.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
+            record2.setTradeType(WalletRecordTradeTypeEnum.TRADE_CHANNEL_FEE);
+            recordList.add(record1);
+            recordList.add(record2);
+            walletRecordDTO.setSubRecords(recordList);
+            walletService.walletRecord(walletRecordDTO);
+        }
+    }
+
 }

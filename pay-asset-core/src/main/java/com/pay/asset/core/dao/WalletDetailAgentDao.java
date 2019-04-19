@@ -8,6 +8,11 @@ import com.pay.asset.client.model.WalletDetailAgentDO;
  */
 public interface WalletDetailAgentDao extends IWalletDetailDao<WalletDetailAgentDO> {
 
+    /**
+     * {@inheritDoc}
+     * @param walletId 钱包id
+     * @return
+     */
     @Override
     WalletDetailAgentDO selectByWalletId(Long walletId);
 }

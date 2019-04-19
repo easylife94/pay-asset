@@ -10,6 +10,12 @@ import com.pay.common.core.dao.IBaseDao;
  */
 public interface IWalletDetailDao<T> extends IBaseDao<T> {
 
+    /**
+     * 查询钱包详情记录
+     *
+     * @param walletId 钱包id
+     * @return 钱包详情记录
+     */
     T selectByWalletId(Long walletId);
 
 }

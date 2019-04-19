@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pay.asset.core.dao.UniqueWalletRecordDao">
+    <sql id="Base_Column_List">
+        unique_key
+        ,
+        create_time
+    </sql>
+    <select id="count" parameterType="java.lang.String" resultType="int">
+        select count(*)
+        from unique_wallet_record
+        where unique_key = #{unique_key,jdbcType=VARCHAR}
+    </select>
+    <insert id="insert" parameterType="com.pay.asset.client.model.UniqueWalletRecordDO">
+        insert into unique_wallet_record (unique_key, create_time)
+        values (#{uniqueKey,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT})
+    </insert>
+</mapper>

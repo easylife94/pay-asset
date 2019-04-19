@@ -8,6 +8,12 @@ import com.pay.asset.client.model.WalletDetailMemberDO;
  */
 public interface WalletDetailMemberDao extends IWalletDetailDao<WalletDetailMemberDO> {
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param walletId 钱包id
+     * @return
+     */
     @Override
     WalletDetailMemberDO selectByWalletId(Long walletId);
 }

@@ -12,6 +12,8 @@ public interface IWalletService {
 
     /**
      * 钱包记录
+     *
+     * @param walletRecordDTO 参数dto
      */
     void walletRecord(WalletRecordDTO walletRecordDTO);
 

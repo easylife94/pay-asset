@@ -1,7 +1,7 @@
 package com.pay.asset.core.service.impl;
 
 import com.pay.asset.client.constants.SpringBeanNamespaces;
-import com.pay.asset.client.constants.WalletRecordPaymentTypeEnum;
+import com.pay.asset.client.constants.WalletOwnRoleEnum;
 import com.pay.asset.client.dto.WalletRecordDTO;
 import com.pay.asset.client.dto.WalletSubRecordDTO;
 import com.pay.asset.client.model.AbstractWalletDetailBaseDO;
@@ -12,6 +12,7 @@ import com.pay.asset.core.dao.WalletDao;
 import com.pay.asset.core.dao.WalletDetailAgentDao;
 import com.pay.asset.core.dao.WalletDetailMemberDao;
 import com.pay.asset.core.service.IUniqueWalletRecordService;
+import com.pay.asset.core.service.IWalletDetailService;
 import com.pay.asset.core.service.IWalletService;
 import com.pay.asset.core.utils.SpringContextUtil;
 import com.pay.asset.core.wallet.IWalletDetailRecordHandle;
@@ -22,8 +23,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
+ * 钱包记录是针对订单，当订单状态发生变化才会发生钱包的变化
+ * 例如：
+ * 1.交易
+ * 交易订单支付成功，会员钱包支出服务费。
+ * 交易订单退款成功，会员钱包支出服务费退款。
+ * 交易订单结算成功，代理商钱包收入服务费分润和通道分润。
+ * 2.充值
+ * 充值订单支付成功，会员钱包收入充值金额。
+ * 充值订单退款成功，会员钱包支出充值金额退款。
+ * 3.
+ *
  * @author chenwei
  * @date 2019/4/17 14:17
  */
@@ -36,14 +49,17 @@ public class WalletServiceImpl implements IWalletService {
     private final WalletDao walletDao;
     private final WalletDetailAgentDao walletDetailAgentDao;
     private final WalletDetailMemberDao walletDetailMemberDao;
+    private final IWalletDetailService walletDetailService;
 
     @Autowired
-    public WalletServiceImpl(IDistributedLockService distributedLockService, IUniqueWalletRecordService uniqueWalletRecordService, WalletDao walletDao, WalletDetailAgentDao walletDetailAgentDao, WalletDetailMemberDao walletDetailMemberDao) {
+    public WalletServiceImpl(IDistributedLockService distributedLockService, IUniqueWalletRecordService uniqueWalletRecordService,
+                             WalletDao walletDao, WalletDetailAgentDao walletDetailAgentDao, WalletDetailMemberDao walletDetailMemberDao, IWalletDetailService walletDetailService) {
         this.distributedLockService = distributedLockService;
         this.uniqueWalletRecordService = uniqueWalletRecordService;
         this.walletDao = walletDao;
         this.walletDetailAgentDao = walletDetailAgentDao;
         this.walletDetailMemberDao = walletDetailMemberDao;
+        this.walletDetailService = walletDetailService;
     }
 
 
@@ -55,107 +71,106 @@ public class WalletServiceImpl implements IWalletService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void walletRecord(WalletRecordDTO walletRecordDTO) {
-        String lockKey = walletRecordDTO.getOrderType().name() + walletRecordDTO.getOrderNumber() + walletRecordDTO.getOrderStatus().name();
+        if (walletRecordDTO.getSubRecords().size() <= 0) {
+            log.error("钱包记录失败，子记录数小于0：{}", walletRecordDTO);
+            return;
+        }
+        //去重校验
+        if (uniqueWalletRecordService.existed(walletRecordDTO)) {
+            log.info("钱包记录操作去重：{}", walletRecordDTO);
+            return;
+        }
+        //对同一个钱包和钱包详情的变化要加锁
+        String lockKey = walletRecordDTO.getOwnRole().name() + walletRecordDTO.getOwnNumber();
         try {
-            if (walletRecordDTO.getSubRecords().size() <= 0) {
-                log.error("钱包记录失败，子记录数小于0：{}", walletRecordDTO);
-            }
+            distributedLockService.lock(lockKey);
+            //1.查询钱包
             WalletDO walletDO = walletDao.selectByOwner(walletRecordDTO.getOwnNumber(), walletRecordDTO.getOwnRole().name());
             if (walletDO == null) {
                 log.error("钱包记录失败，钱包不存在，编号:{},角色：{}", walletRecordDTO.getOwnNumber(), walletRecordDTO.getOwnRole());
             }
-            distributedLockService.lock(lockKey);
-            //todo 钱包变化。需要去重操作（订单号去重）
-            if (!uniqueWalletRecordService.existed(walletRecordDTO.getOrderType(), walletRecordDTO.getOrderNumber(), walletRecordDTO.getOrderStatus())) {
-                //1.查询钱包
-                //2.根据子记录计算钱包变化、钱包详情变化和生成子记录
-                BigDecimal balanceTotal = walletDO.getBalanceTotal();
-                BigDecimal balanceFrozen = walletDO.getBalanceFrozen();
-                BigDecimal balanceUsable = walletDO.getBalanceUsable();
-                BigDecimal expenditureTotal = walletDO.getExpenditureTotal();
-                BigDecimal incomeTotal = walletDO.getIncomeTotal();
-                IWalletDetailRecordHandle walletDetailRecordHandle = (IWalletDetailRecordHandle) SpringContextUtil.getBean(SpringBeanNamespaces.WALLET_DETAIL_HANDLE + walletRecordDTO.getOwnRole().name());
-                AbstractWalletDetailBaseDO walletDetailBaseDO;
-                switch (walletRecordDTO.getOwnRole()) {
-                    case MEMBER:
-                        walletDetailBaseDO = walletDetailMemberDao.selectByWalletId(walletDO.getId());
-                        break;
-                    case AGENT:
-                        walletDetailBaseDO = walletDetailAgentDao.selectByWalletId(walletDO.getId());
-                        break;
-                    default:
-                        throw new RuntimeException("不支持钱包角色类型：" + walletRecordDTO.getOwnRole());
-                }
+            //2.钱包记录
+            walletRecord(walletDO, walletRecordDTO.getSubRecords());
+            //3.钱包详情记录
+            walletDetailRecord(walletRecordDTO.getOwnRole(), walletDO.getId(), walletRecordDTO.getSubRecords());
+            //todo 4.插入钱包子记录
 
-
-                for (WalletSubRecordDTO subRecord : walletRecordDTO.getSubRecords()) {
-                    switch (subRecord.getPaymentType()) {
-                        case IN:
-                            balanceTotal = balanceTotal.add(subRecord.getAmount());
-                            balanceUsable = balanceUsable.add(subRecord.getAmount());
-                            incomeTotal = incomeTotal.add(subRecord.getAmount());
-                            break;
-                        case OUT:
-                            balanceTotal = balanceTotal.subtract(subRecord.getAmount());
-                            balanceUsable = balanceUsable.subtract(subRecord.getAmount());
-                            expenditureTotal = expenditureTotal.add(subRecord.getAmount());
-                            break;
-                        case FROZEN:
-                            balanceFrozen = balanceFrozen.add(subRecord.getAmount());
-                            balanceUsable = balanceUsable.subtract(subRecord.getAmount());
-                            break;
-                        case UNFROZEN:
-                            balanceUsable = balanceUsable.add(subRecord.getAmount());
-                            balanceFrozen = balanceFrozen.subtract(subRecord.getAmount());
-                        case IN_FROZEN:
-                            balanceTotal = balanceTotal.add(subRecord.getAmount());
-                            balanceFrozen = balanceFrozen.add(subRecord.getAmount());
-                            incomeTotal = incomeTotal.add(subRecord.getAmount());
-                            break;
-                        case OUT_UNFROZEN:
-                            balanceTotal = balanceTotal.subtract(subRecord.getAmount());
-                            balanceFrozen = balanceFrozen.subtract(subRecord.getAmount());
-                            expenditureTotal = expenditureTotal.add(subRecord.getAmount());
-                            break;
-                        default:
-                            throw new RuntimeException("不支持钱包记录收支类型：" + subRecord.getPaymentType());
-                    }
-
-                    //钱包详情记录
-                    if(subRecord.getPaymentType() != WalletRecordPaymentTypeEnum.FROZEN){
-                        walletDetailRecordHandle.record(walletDetailBaseDO, subRecord.getTradeType(), subRecord.getAmount());
-                    }
-                }
-                walletDO.setBalanceTotal(balanceTotal);
-                walletDO.setBalanceUsable(balanceUsable);
-                walletDO.setBalanceFrozen(balanceFrozen);
-                walletDO.setIncomeTotal(incomeTotal);
-                walletDO.setExpenditureTotal(expenditureTotal);
-
-                log.info("钱包记录后：{}", walletDO);
-                log.info("钱包详情记录后：{}", walletDetailBaseDO);
-
-                //3.更新钱包、更新钱包详情
-                walletDao.updateByPrimaryKeySelective(walletDO);
-                switch (walletRecordDTO.getOwnRole()) {
-                    case AGENT:
-                        walletDetailAgentDao.updateByPrimaryKey((WalletDetailAgentDO) walletDetailBaseDO);
-                        break;
-                    case MEMBER:
-                        walletDetailMemberDao.updateByPrimaryKeySelective((WalletDetailMemberDO) walletDetailBaseDO);
-                        break;
-                    default:
-                        //跳过
-                }
-
-                //4.插入钱包子记录
-
-
-            } else {
-                log.info("钱包记录操作去重：订单类型：{},订单号：{}");
-            }
+            //5.插入去重表
+            uniqueWalletRecordService.insert(walletRecordDTO);
         } finally {
             distributedLockService.unlock(lockKey);
         }
     }
+
+    /**
+     * 钱包表变化
+     *
+     * @param walletDO   钱包
+     * @param subRecords 子记录
+     */
+    private void walletRecord(WalletDO walletDO, List<WalletSubRecordDTO> subRecords) {
+        for (WalletSubRecordDTO subRecord : subRecords) {
+            BigDecimal balanceTotal = walletDO.getBalanceTotal();
+            BigDecimal balanceFrozen = walletDO.getBalanceFrozen();
+            BigDecimal balanceUsable = walletDO.getBalanceUsable();
+            BigDecimal expenditureTotal = walletDO.getExpenditureTotal();
+            BigDecimal incomeTotal = walletDO.getIncomeTotal();
+            switch (subRecord.getPaymentType()) {
+                case IN:
+                    balanceTotal = balanceTotal.add(subRecord.getAmount());
+                    balanceUsable = balanceUsable.add(subRecord.getAmount());
+                    incomeTotal = incomeTotal.add(subRecord.getAmount());
+                    break;
+                case OUT:
+                    balanceTotal = balanceTotal.subtract(subRecord.getAmount());
+                    balanceUsable = balanceUsable.subtract(subRecord.getAmount());
+                    expenditureTotal = expenditureTotal.add(subRecord.getAmount());
+                    break;
+                case FROZEN:
+                    balanceFrozen = balanceFrozen.add(subRecord.getAmount());
+                    balanceUsable = balanceUsable.subtract(subRecord.getAmount());
+                    break;
+                case UNFROZEN:
+                    balanceUsable = balanceUsable.add(subRecord.getAmount());
+                    balanceFrozen = balanceFrozen.subtract(subRecord.getAmount());
+                case IN_FROZEN:
+                    balanceTotal = balanceTotal.add(subRecord.getAmount());
+                    balanceFrozen = balanceFrozen.add(subRecord.getAmount());
+                    incomeTotal = incomeTotal.add(subRecord.getAmount());
+                    break;
+                case OUT_UNFROZEN:
+                    balanceTotal = balanceTotal.subtract(subRecord.getAmount());
+                    balanceFrozen = balanceFrozen.subtract(subRecord.getAmount());
+                    expenditureTotal = expenditureTotal.add(subRecord.getAmount());
+                    break;
+                default:
+                    throw new RuntimeException("不支持钱包记录收支类型：" + subRecord.getPaymentType());
+            }
+            walletDO.setBalanceTotal(balanceTotal);
+            walletDO.setBalanceUsable(balanceUsable);
+            walletDO.setBalanceFrozen(balanceFrozen);
+            walletDO.setIncomeTotal(incomeTotal);
+            walletDO.setExpenditureTotal(expenditureTotal);
+        }
+        log.info("钱包记录后：{}", walletDO);
+        walletDao.updateByPrimaryKeySelective(walletDO);
+    }
+
+    /**
+     * 钱包详情记录
+     *
+     * @param ownRole    钱包拥有者
+     * @param walletId   钱包id
+     * @param subRecords 子记录
+     */
+    private void walletDetailRecord(WalletOwnRoleEnum ownRole, Long walletId, List<WalletSubRecordDTO> subRecords) {
+        IWalletDetailRecordHandle walletDetailRecordHandle = (IWalletDetailRecordHandle) SpringContextUtil.getBean(SpringBeanNamespaces.WALLET_DETAIL_HANDLE + ownRole.name());
+        AbstractWalletDetailBaseDO walletDetailBaseDO = walletDetailService.selectByWalletId(ownRole, walletId);
+        for (WalletSubRecordDTO subRecord : subRecords) {
+            walletDetailRecordHandle.record(walletDetailBaseDO, subRecord.getTradeType(), subRecord.getAmount());
+        }
+        log.info("钱包详情记录后：{}", walletDetailBaseDO);
+        walletDetailService.update(ownRole, walletDetailBaseDO);
+    }
+
 }

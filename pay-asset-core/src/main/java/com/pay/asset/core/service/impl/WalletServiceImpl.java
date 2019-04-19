@@ -84,18 +84,14 @@ public class WalletServiceImpl implements IWalletService {
         String lockKey = walletRecordDTO.getOwnRole().name() + walletRecordDTO.getOwnNumber();
         try {
             distributedLockService.lock(lockKey);
-            //1.查询钱包
             WalletDO walletDO = walletDao.selectByOwner(walletRecordDTO.getOwnNumber(), walletRecordDTO.getOwnRole().name());
             if (walletDO == null) {
                 log.error("钱包记录失败，钱包不存在，编号:{},角色：{}", walletRecordDTO.getOwnNumber(), walletRecordDTO.getOwnRole());
+                return;
             }
-            //2.钱包记录
             walletRecord(walletDO, walletRecordDTO.getSubRecords());
-            //3.钱包详情记录
             walletDetailRecord(walletRecordDTO.getOwnRole(), walletDO.getId(), walletRecordDTO.getSubRecords());
             //todo 4.插入钱包子记录
-
-            //5.插入去重表
             uniqueWalletRecordService.insert(walletRecordDTO);
         } finally {
             distributedLockService.unlock(lockKey);

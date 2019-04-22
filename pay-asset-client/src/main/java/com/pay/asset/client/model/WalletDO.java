@@ -47,4 +47,10 @@ public class WalletDO extends AbstractBaseDO {
      */
     private BigDecimal expenditureTotal;
 
+    public WalletDO(Long id) {
+        super(id);
+    }
+
+    public WalletDO() {
+    }
 }

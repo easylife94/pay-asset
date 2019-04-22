@@ -27,4 +27,11 @@ public class WalletDetailAgentDO extends AbstractWalletDetailBaseDO {
      * 支出 - 提现费用
      */
     private BigDecimal expenditureWithdrawFee;
+
+    public WalletDetailAgentDO(Long id) {
+        super(id);
+    }
+
+    public WalletDetailAgentDO() {
+    }
 }

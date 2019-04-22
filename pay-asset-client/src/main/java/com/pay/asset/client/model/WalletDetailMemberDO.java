@@ -33,4 +33,10 @@ public class WalletDetailMemberDO extends AbstractWalletDetailBaseDO {
      */
     private BigDecimal expenditureWithdrawFee;
 
+    public WalletDetailMemberDO(Long id) {
+        super(id);
+    }
+
+    public WalletDetailMemberDO() {
+    }
 }

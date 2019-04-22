@@ -14,4 +14,11 @@ public abstract class AbstractWalletDetailBaseDO extends AbstractBaseDO {
      * 钱包ID
      */
     private Long walletId;
+
+    public AbstractWalletDetailBaseDO(Long id) {
+        super(id);
+    }
+
+    public AbstractWalletDetailBaseDO() {
+    }
 }

@@ -6,19 +6,22 @@ import com.pay.asset.client.dto.WalletRecordDTO;
 import com.pay.asset.client.dto.WalletSubRecordDTO;
 import com.pay.asset.client.model.AbstractWalletDetailBaseDO;
 import com.pay.asset.client.model.WalletDO;
-import com.pay.asset.client.model.WalletDetailAgentDO;
-import com.pay.asset.client.model.WalletDetailMemberDO;
+import com.pay.asset.client.model.WalletRecordDO;
 import com.pay.asset.core.dao.WalletDao;
 import com.pay.asset.core.dao.WalletDetailAgentDao;
 import com.pay.asset.core.dao.WalletDetailMemberDao;
+import com.pay.asset.core.dao.WalletRecordDao;
 import com.pay.asset.core.service.IUniqueWalletRecordService;
 import com.pay.asset.core.service.IWalletDetailService;
 import com.pay.asset.core.service.IWalletService;
 import com.pay.asset.core.utils.SpringContextUtil;
 import com.pay.asset.core.wallet.IWalletDetailRecordHandle;
 import com.pay.common.core.service.IDistributedLockService;
+import com.pay.common.core.service.IIdService;
+import com.pay.common.core.service.impl.IdServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +38,10 @@ import java.util.List;
  * 2.充值
  * 充值订单支付成功，会员钱包收入充值金额。
  * 充值订单退款成功，会员钱包支出充值金额退款。
- * 3.
+ * 3.提现
+ * 提现订单下单成功（提交成功），会员钱包冻结提现金额
+ * 提现订单支付成功（审核成功），会员钱包解冻支出提现金额
+ * 提现订单支付失败（审核失败），会员钱包解冻提现金额
  *
  * @author chenwei
  * @date 2019/4/17 14:17
@@ -44,27 +50,36 @@ import java.util.List;
 @Service
 public class WalletServiceImpl implements IWalletService {
 
+    @Value("${wallet.record.serial-number-prefix}")
+    private String subRecordSerialNumberPrefix;
+
+    private final IIdService idService;
     private final IDistributedLockService distributedLockService;
     private final IUniqueWalletRecordService uniqueWalletRecordService;
     private final WalletDao walletDao;
     private final WalletDetailAgentDao walletDetailAgentDao;
     private final WalletDetailMemberDao walletDetailMemberDao;
     private final IWalletDetailService walletDetailService;
+    private final WalletRecordDao walletRecordDao;
 
     @Autowired
-    public WalletServiceImpl(IDistributedLockService distributedLockService, IUniqueWalletRecordService uniqueWalletRecordService,
-                             WalletDao walletDao, WalletDetailAgentDao walletDetailAgentDao, WalletDetailMemberDao walletDetailMemberDao, IWalletDetailService walletDetailService) {
+    public WalletServiceImpl(IIdService idService, IDistributedLockService distributedLockService, IUniqueWalletRecordService uniqueWalletRecordService,
+                             WalletDao walletDao, WalletDetailAgentDao walletDetailAgentDao, WalletDetailMemberDao walletDetailMemberDao,
+                             IWalletDetailService walletDetailService, WalletRecordDao walletRecordDao) {
+        this.idService = idService;
         this.distributedLockService = distributedLockService;
         this.uniqueWalletRecordService = uniqueWalletRecordService;
         this.walletDao = walletDao;
         this.walletDetailAgentDao = walletDetailAgentDao;
         this.walletDetailMemberDao = walletDetailMemberDao;
         this.walletDetailService = walletDetailService;
+        this.walletRecordDao = walletRecordDao;
     }
 
 
     /**
      * 订单状态变化才会触发钱包变化
+     * 对同一个钱包的变化加了分布式锁控制并发
      *
      * @param walletRecordDTO 钱包记录参数
      */
@@ -75,23 +90,22 @@ public class WalletServiceImpl implements IWalletService {
             log.error("钱包记录失败，子记录数小于0：{}", walletRecordDTO);
             return;
         }
-        //去重校验
-        if (uniqueWalletRecordService.existed(walletRecordDTO)) {
-            log.info("钱包记录操作去重：{}", walletRecordDTO);
-            return;
-        }
         //对同一个钱包和钱包详情的变化要加锁
         String lockKey = walletRecordDTO.getOwnRole().name() + walletRecordDTO.getOwnNumber();
         try {
             distributedLockService.lock(lockKey);
+            //去重校验
+            if (uniqueWalletRecordService.existed(walletRecordDTO)) {
+                log.info("钱包记录操作去重：{}", walletRecordDTO);
+                return;
+            }
             WalletDO walletDO = walletDao.selectByOwner(walletRecordDTO.getOwnNumber(), walletRecordDTO.getOwnRole().name());
             if (walletDO == null) {
                 log.error("钱包记录失败，钱包不存在，编号:{},角色：{}", walletRecordDTO.getOwnNumber(), walletRecordDTO.getOwnRole());
                 return;
             }
-            walletRecord(walletDO, walletRecordDTO.getSubRecords());
+            walletRecord(walletDO, walletRecordDTO);
             walletDetailRecord(walletRecordDTO.getOwnRole(), walletDO.getId(), walletRecordDTO.getSubRecords());
-            //todo 4.插入钱包子记录
             uniqueWalletRecordService.insert(walletRecordDTO);
         } finally {
             distributedLockService.unlock(lockKey);
@@ -101,16 +115,33 @@ public class WalletServiceImpl implements IWalletService {
     /**
      * 钱包表变化
      *
-     * @param walletDO   钱包
-     * @param subRecords 子记录
+     * @param walletDO        钱包
+     * @param walletRecordDTO 记录
      */
-    private void walletRecord(WalletDO walletDO, List<WalletSubRecordDTO> subRecords) {
-        for (WalletSubRecordDTO subRecord : subRecords) {
-            BigDecimal balanceTotal = walletDO.getBalanceTotal();
-            BigDecimal balanceFrozen = walletDO.getBalanceFrozen();
-            BigDecimal balanceUsable = walletDO.getBalanceUsable();
-            BigDecimal expenditureTotal = walletDO.getExpenditureTotal();
-            BigDecimal incomeTotal = walletDO.getIncomeTotal();
+    private void walletRecord(WalletDO walletDO, WalletRecordDTO walletRecordDTO) {
+        BigDecimal balanceTotal = walletDO.getBalanceTotal();
+        BigDecimal balanceFrozen = walletDO.getBalanceFrozen();
+        BigDecimal balanceUsable = walletDO.getBalanceUsable();
+        BigDecimal expenditureTotal = walletDO.getExpenditureTotal();
+        BigDecimal incomeTotal = walletDO.getIncomeTotal();
+
+        for (WalletSubRecordDTO subRecord : walletRecordDTO.getSubRecords()) {
+            //子钱包记录
+            WalletRecordDO walletRecordDO = new WalletRecordDO(idService.generateId());
+            walletRecordDO.setWalletId(walletDO.getId());
+            walletRecordDO.setOrderType(walletRecordDTO.getOrderType().name());
+            walletRecordDO.setOrderNumber(walletRecordDTO.getOrderNumber());
+            walletRecordDO.setOrderStatus(walletRecordDTO.getOrderStatus().name());
+            walletRecordDO.setPaymentType(subRecord.getPaymentType().name());
+            walletRecordDO.setTradeType(subRecord.getTradeType().name());
+            walletRecordDO.setTradeTime(subRecord.getTradeTime());
+            walletRecordDO.setTradeAmount(subRecord.getAmount());
+            walletRecordDO.setSerialNumber(walletSubRecordSerialNumber());
+
+            //变化前
+            walletRecordDO.setBalanceTotalBefore(balanceTotal);
+            walletRecordDO.setBalanceUsableBefore(balanceUsable);
+            walletRecordDO.setBalanceFrozenBefore(balanceFrozen);
             switch (subRecord.getPaymentType()) {
                 case IN:
                     balanceTotal = balanceTotal.add(subRecord.getAmount());
@@ -142,14 +173,22 @@ public class WalletServiceImpl implements IWalletService {
                 default:
                     throw new RuntimeException("不支持钱包记录收支类型：" + subRecord.getPaymentType());
             }
-            walletDO.setBalanceTotal(balanceTotal);
-            walletDO.setBalanceUsable(balanceUsable);
-            walletDO.setBalanceFrozen(balanceFrozen);
-            walletDO.setIncomeTotal(incomeTotal);
-            walletDO.setExpenditureTotal(expenditureTotal);
+            //变化后
+            walletRecordDO.setBalanceTotalAfter(balanceTotal);
+            walletRecordDO.setBalanceUsableAfter(balanceUsable);
+            walletRecordDO.setBalanceFrozenAfter(balanceFrozen);
+            log.info("钱包子记录后：{}", walletRecordDO);
+            walletRecordDao.insert(walletRecordDO);
         }
+        walletDO.setBalanceTotal(balanceTotal);
+        walletDO.setBalanceUsable(balanceUsable);
+        walletDO.setBalanceFrozen(balanceFrozen);
+        walletDO.setIncomeTotal(incomeTotal);
+        walletDO.setExpenditureTotal(expenditureTotal);
         log.info("钱包记录后：{}", walletDO);
         walletDao.updateByPrimaryKeySelective(walletDO);
+
+
     }
 
     /**
@@ -167,6 +206,31 @@ public class WalletServiceImpl implements IWalletService {
         }
         log.info("钱包详情记录后：{}", walletDetailBaseDO);
         walletDetailService.update(ownRole, walletDetailBaseDO);
+    }
+
+    /**
+     * 钱包子记录
+     *
+     * @param walletRecordDTO
+     * @param balanceTotal
+     * @param balanceUsable
+     * @param balanceFrozen
+     */
+    private void walletSubRecord(WalletRecordDTO walletRecordDTO, BigDecimal balanceTotal, BigDecimal balanceUsable, BigDecimal balanceFrozen) {
+
+        for (WalletSubRecordDTO subRecord : walletRecordDTO.getSubRecords()) {
+
+
+        }
+    }
+
+    /**
+     * 生成钱包子记录流水号
+     *
+     * @return 流水号
+     */
+    private String walletSubRecordSerialNumber() {
+        return subRecordSerialNumberPrefix + idService.generateId();
     }
 
 }

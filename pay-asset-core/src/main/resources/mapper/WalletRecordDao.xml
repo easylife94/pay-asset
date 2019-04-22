@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pay.asset.core.dao.WalletRecordDao">
+    <resultMap id="BaseResultMap" type="com.pay.asset.client.model.WalletRecordDO">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_update" jdbcType="TIMESTAMP" property="gmtUpdate"/>
+        <result column="is_deleted" jdbcType="BIT" property="isDeleted"/>
+
+        <result column="wallet_id" jdbcType="BIGINT" property="walletId"/>
+        <result column="order_type" jdbcType="VARCHAR" property="orderType"/>
+        <result column="order_number" jdbcType="VARCHAR" property="orderNumber"/>
+        <result column="order_status" jdbcType="VARCHAR" property="orderStatus"/>
+        <result column="payment_type" jdbcType="VARCHAR" property="paymentType"/>
+        <result column="trade_type" jdbcType="VARCHAR" property="tradeType"/>
+        <result column="trade_amount" jdbcType="DECIMAL" property="tradeAmount"/>
+        <result column="trade_time" jdbcType="TIMESTAMP" property="tradeTime"/>
+        <result column="serial_number" jdbcType="VARCHAR" property="serialNumber"/>
+        <result column="balance_total_before" jdbcType="DECIMAL" property="balanceTotalBefore"/>
+        <result column="balance_total_after" jdbcType="DECIMAL" property="balanceTotalAfter"/>
+        <result column="balance_usable_before" jdbcType="DECIMAL" property="balanceUsableBefore"/>
+        <result column="balance_usable_after" jdbcType="DECIMAL" property="balanceUsableAfter"/>
+        <result column="balance_frozen_before" jdbcType="DECIMAL" property="balanceFrozenBefore"/>
+        <result column="balance_frozen_after" jdbcType="DECIMAL" property="balanceFrozenAfter"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        ,
+        gmt_create,
+        gmt_update,
+        is_deleted,
+
+        wallet_id,
+        order_type,
+        order_number,
+        order_status,
+        payment_type,
+        trade_type,
+        trade_amount,
+        trade_time,
+        serial_number,
+        balance_total_before,
+        balance_total_after,
+        balance_usable_before,
+        balance_usable_after,
+        balance_frozen_before,
+        balance_frozen_after
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from wallet_record
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from wallet_record
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.pay.asset.client.model.WalletRecordDO">
+        insert into wallet_record (id, gmt_create, gmt_update, is_deleted,
+                                   wallet_id, order_type, order_number, order_status, payment_type, trade_type,
+                                   trade_amount, trade_time, serial_number, balance_total_before, balance_total_after,
+                                   balance_usable_before,
+                                   balance_usable_after, balance_frozen_before, balance_frozen_after)
+        values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtUpdate,jdbcType=TIMESTAMP},
+                #{isDeleted,jdbcType=BIT},
+                #{walletId,jdbcType=BIGINT}, #{orderType,jdbcType=VARCHAR}, #{orderNumber,jdbcType=VARCHAR},
+                #{orderStatus,jdbcType=VARCHAR}, #{paymentType,jdbcType=VARCHAR},
+                #{tradeType,jdbcType=VARCHAR}, #{tradeAmount,jdbcType=DECIMAL},
+                #{tradeTime,jdbcType=TIMESTAMP}, #{serialNumber,jdbcType=VARCHAR},
+                #{balanceTotalBefore,jdbcType=DECIMAL},
+                #{balanceTotalAfter,jdbcType=DECIMAL},
+                #{balanceUsableBefore,jdbcType=DECIMAL}, #{balanceUsableAfter,jdbcType=DECIMAL},
+                #{balanceFrozenBefore,jdbcType=DECIMAL}, #{balanceFrozenAfter,jdbcType=DECIMAL})
+    </insert>
+    <insert id="insertSelective" parameterType="com.pay.asset.client.model.WalletRecordDO">
+        insert into wallet_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="gmtCreate != null">
+                gmt_create,
+            </if>
+            <if test="gmtUpdate != null">
+                gmt_update,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+
+            <if test="walletId != null">
+                wallet_id,
+            </if>
+            <if test="orderType != null">
+                order_type,
+            </if>
+            <if test="orderNumber != null">
+                order_number,
+            </if>
+            <if test="orderStatus != null">
+                order_status,
+            </if>
+            <if test="paymentType != null">
+                payment_type,
+            </if>
+            <if test="tradeType != null">
+                trade_type,
+            </if>
+            <if test="tradeAmount != null">
+                trade_amount,
+            </if>
+            <if test="tradeTime != null">
+                trade_time,
+            </if>
+            <if test="serialNumber != null">
+                serial_number,
+            </if>
+            <if test="balanceTotalBefore != null">
+                balance_total_before,
+            </if>
+            <if test="balanceTotalAfter != null">
+                balance_total_after,
+            </if>
+            <if test="balanceUsableBefore != null">
+                balance_usable_before,
+            </if>
+            <if test="balanceUsableAfter != null">
+                balance_usable_after,
+            </if>
+            <if test="balanceFrozenBefore != null">
+                balance_frozen_before,
+            </if>
+            <if test="balanceFrozenAfter != null">
+                balance_frozen_after,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="gmtCreate != null">
+                #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtUpdate != null">
+                #{gmtUpdate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=BIT},
+            </if>
+
+            <if test="walletId != null">
+                #{walletId,jdbcType=BIGINT},
+            </if>
+            <if test="orderType != null">
+                #{orderType,jdbcType=VARCHAR},
+            </if>
+            <if test="orderNumber != null">
+                #{orderNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="orderStatus != null">
+                #{orderStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="paymentType != null">
+                #{paymentType,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeType != null">
+                #{tradeType,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeTime != null">
+                #{tradeTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="tradeAmount != null">
+                #{tradeAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="serialNumber != null">
+                #{serialNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceTotalBefore != null">
+                #{balanceTotalBefore,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceTotalAfter != null">
+                #{balanceTotalAfter,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceUsableBefore != null">
+                #{balanceUsableBefore,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceUsableAfter != null">
+                #{balanceUsableAfter,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceFrozenBefore != null">
+                #{balanceUsableBefore,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceFrozenAfter != null">
+                #{balanceFrozenAfter,jdbcType=DECIMAL},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.pay.asset.client.model.WalletDO">
+        update wallet_record
+        <set>
+            <if test="gmtCreate != null">
+                gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtUpdate != null">
+                gmt_update = #{gmtUpdate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=BIT},
+            </if>
+
+            <if test="walletId != null">
+                wallet_id = #{walletId,jdbcType=BIGINT},
+            </if>
+            <if test="orderType != null">
+                order_type = #{orderType,jdbcType=VARCHAR},
+            </if>
+            <if test="orderNumber != null">
+                order_number = #{orderNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="orderStatus != null">
+                order_status = #{orderStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="paymentType != null">
+                payment_type = #{paymentType,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeType != null">
+                trade_type = #{tradeType,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeTime != null">
+                trade_time = #{tradeTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="tradeAmount != null">
+                trade_amount = #{tradeAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="serialNumber != null">
+                serial_number = #{serialNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="balanceTotalBefore != null">
+                balance_total_before = #{balanceTotalBefore,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceTotalAfter != null">
+                balance_total_after = #{balanceTotalAfter,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceUsableBefore != null">
+                balance_usable_before = #{balanceUsableBefore,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceUsableAfter != null">
+                balance_usable_after = #{balanceUsableAfter,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceFrozenBefore != null">
+                balance_frozen_before = #{balanceFrozenBefore,jdbcType=DECIMAL},
+            </if>
+            <if test="balanceFrozenAfter != null">
+                balance_frozen_after = #{balanceFrozenAfter,jdbcType=DECIMAL},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.pay.asset.client.model.WalletDO">
+        update wallet_record
+        set
+            gmt_create            = #{gmtCreate,jdbcType=TIMESTAMP},
+            gmt_update            = #{gmtUpdate,jdbcType=TIMESTAMP},
+            is_deleted            = #{isDeleted,jdbcType=BIT},
+
+            wallet_id             = #{walletId,jdbcType=BIGINT},
+            order_type            = #{orderType,jdbcType=VARCHAR},
+            order_number          = #{orderNumber,jdbcType=VARCHAR},
+            order_status          = #{orderStatus,jdbcType=VARCHAR},
+            payment_type          = #{paymentType,jdbcType=VARCHAR},
+            trade_type            = #{tradeType,jdbcType=VARCHAR},
+            trade_time            = #{tradeTime,jdbcType=TIMESTAMP},
+            trade_amount          = #{tradeAmount,jdbcType=DECIMAL},
+            serial_number         = #{serialNumber,jdbcType=VARCHAR},
+            balance_total_before  = #{balanceTotalBefore,jdbcType=DECIMAL},
+            balance_total_after   = #{balanceTotalAfter,jdbcType=DECIMAL},
+            balance_usable_before = #{balanceUsableBefore,jdbcType=DECIMAL},
+            balance_usable_after  = #{balanceUsableAfter,jdbcType=DECIMAL},
+            balance_frozen_before = #{balanceFrozenBefore,jdbcType=DECIMAL},
+            balance_frozen_after  = #{balanceFrozenAfter,jdbcType=DECIMAL}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

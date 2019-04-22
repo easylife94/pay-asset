@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,15 +34,19 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
         walletRecordDTO.setOwnNumber("A00001");
         walletRecordDTO.setOwnRole(WalletOwnRoleEnum.MEMBER);
         List<WalletSubRecordDTO> recordList = new ArrayList<>();
+
         WalletSubRecordDTO record1 = new WalletSubRecordDTO();
         record1.setAmount(new BigDecimal("2.00"));
         record1.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
         record1.setTradeType(WalletRecordTradeTypeEnum.TRADE_SERVICE_FEE);
+        record1.setTradeTime(new Date());
 
         WalletSubRecordDTO record2 = new WalletSubRecordDTO();
         record2.setAmount(new BigDecimal("2.00"));
         record2.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
         record2.setTradeType(WalletRecordTradeTypeEnum.TRADE_CHANNEL_FEE);
+        record2.setTradeTime(new Date());
+
         recordList.add(record1);
         recordList.add(record2);
         walletRecordDTO.setSubRecords(recordList);
@@ -64,6 +69,7 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
         record.setAmount(new BigDecimal("1500"));
         record.setPaymentType(WalletRecordPaymentTypeEnum.IN);
         record.setTradeType(WalletRecordTradeTypeEnum.MEMBER_RECHARGE);
+        record.setTradeTime(new Date());
         recordList.add(record);
         walletRecordDTO.setSubRecords(recordList);
         walletService.walletRecord(walletRecordDTO);
@@ -87,6 +93,7 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
         record1.setAmount(new BigDecimal("250"));
         record1.setPaymentType(WalletRecordPaymentTypeEnum.FROZEN);
         record1.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_FROZEN);
+        record1.setTradeTime(new Date());
         recordList.add(record1);
         walletRecordDTO.setSubRecords(recordList);
         walletService.walletRecord(walletRecordDTO);
@@ -110,16 +117,17 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
         record1.setAmount(new BigDecimal("250"));
         record1.setPaymentType(WalletRecordPaymentTypeEnum.OUT_UNFROZEN);
         record1.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_UNFROZEN);
-
+        record1.setTradeTime(new Date());
         WalletSubRecordDTO record2 = new WalletSubRecordDTO();
         record2.setAmount(new BigDecimal("10"));
         record2.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
         record2.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_SERVICE_FEE);
-
+        record2.setTradeTime(new Date());
         WalletSubRecordDTO record3 = new WalletSubRecordDTO();
         record3.setAmount(new BigDecimal("10"));
         record3.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
         record3.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_TAX);
+        record3.setTradeTime(new Date());
         recordList.add(record1);
         recordList.add(record2);
         recordList.add(record3);
@@ -146,12 +154,12 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
         record1.setAmount(new BigDecimal("2"));
         record1.setPaymentType(WalletRecordPaymentTypeEnum.IN);
         record1.setTradeType(WalletRecordTradeTypeEnum.TRADE_SERVICE_PROFIT);
-
+        record1.setTradeTime(new Date());
         WalletSubRecordDTO record2 = new WalletSubRecordDTO();
         record2.setAmount(new BigDecimal("2"));
         record2.setPaymentType(WalletRecordPaymentTypeEnum.IN);
         record2.setTradeType(WalletRecordTradeTypeEnum.TRADE_CHANNEL_PROFIT);
-
+        record2.setTradeTime(new Date());
         recordList.add(record1);
         recordList.add(record2);
         walletRecordDTO.setSubRecords(recordList);
@@ -176,6 +184,7 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
         record1.setAmount(new BigDecimal("2"));
         record1.setPaymentType(WalletRecordPaymentTypeEnum.FROZEN);
         record1.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_FROZEN);
+        record1.setTradeTime(new Date());
         recordList.add(record1);
         walletRecordDTO.setSubRecords(recordList);
         walletService.walletRecord(walletRecordDTO);
@@ -199,16 +208,17 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
         record1.setAmount(new BigDecimal("2"));
         record1.setPaymentType(WalletRecordPaymentTypeEnum.OUT_UNFROZEN);
         record1.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_UNFROZEN);
-
+        record1.setTradeTime(new Date());
         WalletSubRecordDTO record2 = new WalletSubRecordDTO();
         record2.setAmount(new BigDecimal("0.01"));
         record2.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
         record2.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_SERVICE_FEE);
-
+        record2.setTradeTime(new Date());
         WalletSubRecordDTO record3 = new WalletSubRecordDTO();
         record3.setAmount(new BigDecimal("0.01"));
         record3.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
         record3.setTradeType(WalletRecordTradeTypeEnum.WITHDRAW_TAX);
+        record3.setTradeTime(new Date());
         recordList.add(record1);
         recordList.add(record2);
         recordList.add(record3);
@@ -222,7 +232,7 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
     @Test
     public void uniqueWalletTradeRecordTest() {
         String orderNumber = "TEST-" + System.currentTimeMillis();
-        for (int i = 0; i < 2;i++ ) {
+        for (int i = 0; i < 2; i++) {
             WalletRecordDTO walletRecordDTO = new WalletRecordDTO();
             walletRecordDTO.setOrderNumber(orderNumber);
             walletRecordDTO.setOrderStatus(WalletRecordOrderStatusEnum.PAYMENT);
@@ -234,11 +244,12 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
             record1.setAmount(new BigDecimal("2.00"));
             record1.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
             record1.setTradeType(WalletRecordTradeTypeEnum.TRADE_SERVICE_FEE);
-
+            record1.setTradeTime(new Date());
             WalletSubRecordDTO record2 = new WalletSubRecordDTO();
             record2.setAmount(new BigDecimal("2.00"));
             record2.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
             record2.setTradeType(WalletRecordTradeTypeEnum.TRADE_CHANNEL_FEE);
+            record2.setTradeTime(new Date());
             recordList.add(record1);
             recordList.add(record2);
             walletRecordDTO.setSubRecords(recordList);
@@ -246,4 +257,61 @@ public class WalletServiceTests extends PayAssetWebApplicationTests {
         }
     }
 
+    /**
+     * 并发测试
+     * 会员同时交易和充值
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void currentWalletTradeRecordTest() throws InterruptedException {
+        Thread t1 = new Thread(() -> {
+            String tradeOrderNumber = "TEST-" + System.currentTimeMillis();
+            WalletRecordDTO walletRecordDTO = new WalletRecordDTO();
+            walletRecordDTO.setOrderNumber(tradeOrderNumber);
+            walletRecordDTO.setOrderStatus(WalletRecordOrderStatusEnum.PAYMENT);
+            walletRecordDTO.setOrderType(WalletRecordOrderTypeEnum.TRADE_ORDER);
+            walletRecordDTO.setOwnNumber("A00001");
+            walletRecordDTO.setOwnRole(WalletOwnRoleEnum.MEMBER);
+            List<WalletSubRecordDTO> recordList = new ArrayList<>();
+            WalletSubRecordDTO record1 = new WalletSubRecordDTO();
+            record1.setAmount(new BigDecimal("2.00"));
+            record1.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
+            record1.setTradeType(WalletRecordTradeTypeEnum.TRADE_SERVICE_FEE);
+            record1.setTradeTime(new Date());
+            WalletSubRecordDTO record2 = new WalletSubRecordDTO();
+            record2.setAmount(new BigDecimal("2.00"));
+            record2.setPaymentType(WalletRecordPaymentTypeEnum.OUT);
+            record2.setTradeType(WalletRecordTradeTypeEnum.TRADE_CHANNEL_FEE);
+            record2.setTradeTime(new Date());
+            recordList.add(record1);
+            recordList.add(record2);
+            walletRecordDTO.setSubRecords(recordList);
+            walletService.walletRecord(walletRecordDTO);
+        });
+
+        Thread t2 = new Thread(() -> {
+            WalletRecordDTO walletRecordDTO = new WalletRecordDTO();
+            walletRecordDTO.setOrderNumber("TEST-" + System.currentTimeMillis());
+            walletRecordDTO.setOrderStatus(WalletRecordOrderStatusEnum.PAYMENT);
+            walletRecordDTO.setOrderType(WalletRecordOrderTypeEnum.RECHARGE_ORDER);
+            walletRecordDTO.setOwnNumber("A00001");
+            walletRecordDTO.setOwnRole(WalletOwnRoleEnum.MEMBER);
+            List<WalletSubRecordDTO> recordList = new ArrayList<>();
+            WalletSubRecordDTO record = new WalletSubRecordDTO();
+            record.setAmount(new BigDecimal("1500"));
+            record.setPaymentType(WalletRecordPaymentTypeEnum.IN);
+            record.setTradeType(WalletRecordTradeTypeEnum.MEMBER_RECHARGE);
+            record.setTradeTime(new Date());
+            recordList.add(record);
+            walletRecordDTO.setSubRecords(recordList);
+            walletService.walletRecord(walletRecordDTO);
+
+        });
+        t1.start();
+        t2.start();
+
+        //主线程休眠
+        Thread.sleep(50000);
+    }
 }

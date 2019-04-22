@@ -18,13 +18,19 @@ spring:
 mybatis:
   mapper-locations: classpath*:/mapper/*.xml
   configuration:
-    ##ÆôÓÃ´ÓÊı¾İ¿âÁĞÃûA_COLUMNµ½ÍÕ·å´óĞ¡Ğ´JavaÊôĞÔÃûaColumnµÄ×Ô¶¯Ó³Éä¡£
+    ##å¯ç”¨ä»æ•°æ®åº“åˆ—åA_COLUMNåˆ°é©¼å³°å¤§å°å†™Javaå±æ€§åaColumnçš„è‡ªåŠ¨æ˜ å°„ã€‚
     map-underscore-to-camel-case: true
-    ##ÔÊĞíJDBCÖ§³ÖÉú³ÉµÄ¼ü
+    ##å…è®¸JDBCæ”¯æŒç”Ÿæˆçš„é”®
     use-generated-keys: true
-    ##¿ªÆôÈÕÖ¾´òÓ¡
+    ##å¼€å¯æ—¥å¿—æ‰“å°
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 feign:
   hystrix:
     enabled: true
+
+################################################è‡ªå®šä¹‰################################################
+wallet:
+  record:
+    ##wallet record ç¼©å†™
+    serial-number-prefix: WR

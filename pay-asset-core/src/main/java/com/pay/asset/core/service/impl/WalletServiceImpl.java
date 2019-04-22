@@ -99,7 +99,6 @@ public class WalletServiceImpl implements IWalletService {
             walletRecord(walletDO, walletRecordDTO);
             walletDetailRecord(walletRecordDTO.getOwnRole(), walletDO.getId(), walletRecordDTO.getSubRecords());
             uniqueWalletRecordService.insert(walletRecordDTO);
-            throw new RuntimeException();
         } finally {
             distributedLockService.unlock(lockKey);
         }

@@ -1,5 +1,6 @@
 package com.pay.asset.core.rabbit;
 
+import com.alibaba.fastjson.JSONObject;
 import com.pay.asset.client.constants.PayAssetMessageQueueNames;
 import com.pay.asset.client.dto.async.TradeStatisticsMessageDTO;
 import com.pay.asset.client.dto.async.WalletRecordMessageDTO;
@@ -45,13 +46,14 @@ public class RabbitMqReceiver {
     }
 
     @RabbitListener(queues = PayAssetMessageQueueNames.QUEUE_WALLET_RECORD)
-    public void walletRecord(WalletRecordMessageDTO walletRecordMessageDTO) {
+    public void walletRecord(String content) {
         try {
-            log.info("收到钱包记录消息：{}", walletRecordMessageDTO);
+            log.info("收到钱包记录消息：{}", content);
+            WalletRecordMessageDTO walletRecordMessageDTO = JSONObject.toJavaObject(JSONObject.parseObject(content), WalletRecordMessageDTO.class);
             walletService.walletRecord(walletRecordMessageDTO);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("交易钱包记录处理异常，消息内容:{}，异常：{}", walletRecordMessageDTO, e.getMessage());
+            log.error("交易钱包记录处理异常，消息内容:{}，异常：{}", content, e.getMessage());
         }
     }
 

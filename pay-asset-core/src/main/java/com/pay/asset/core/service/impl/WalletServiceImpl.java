@@ -8,8 +8,6 @@ import com.pay.asset.client.model.AbstractWalletDetailBaseDO;
 import com.pay.asset.client.model.WalletDO;
 import com.pay.asset.client.model.WalletRecordDO;
 import com.pay.asset.core.dao.WalletDao;
-import com.pay.asset.core.dao.WalletDetailAgentDao;
-import com.pay.asset.core.dao.WalletDetailMemberDao;
 import com.pay.asset.core.dao.WalletRecordDao;
 import com.pay.asset.core.service.IUniqueWalletRecordService;
 import com.pay.asset.core.service.IWalletDetailService;
@@ -18,7 +16,6 @@ import com.pay.asset.core.utils.SpringContextUtil;
 import com.pay.asset.core.wallet.IWalletDetailRecordHandle;
 import com.pay.common.core.service.IDistributedLockService;
 import com.pay.common.core.service.IIdService;
-import com.pay.common.core.service.impl.IdServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,23 +53,18 @@ public class WalletServiceImpl implements IWalletService {
     private final IIdService idService;
     private final IDistributedLockService distributedLockService;
     private final IUniqueWalletRecordService uniqueWalletRecordService;
-    private final WalletDao walletDao;
-    private final WalletDetailAgentDao walletDetailAgentDao;
-    private final WalletDetailMemberDao walletDetailMemberDao;
     private final IWalletDetailService walletDetailService;
+    private final WalletDao walletDao;
     private final WalletRecordDao walletRecordDao;
 
     @Autowired
     public WalletServiceImpl(IIdService idService, IDistributedLockService distributedLockService, IUniqueWalletRecordService uniqueWalletRecordService,
-                             WalletDao walletDao, WalletDetailAgentDao walletDetailAgentDao, WalletDetailMemberDao walletDetailMemberDao,
-                             IWalletDetailService walletDetailService, WalletRecordDao walletRecordDao) {
+                             IWalletDetailService walletDetailService, WalletDao walletDao, WalletRecordDao walletRecordDao) {
         this.idService = idService;
         this.distributedLockService = distributedLockService;
         this.uniqueWalletRecordService = uniqueWalletRecordService;
-        this.walletDao = walletDao;
-        this.walletDetailAgentDao = walletDetailAgentDao;
-        this.walletDetailMemberDao = walletDetailMemberDao;
         this.walletDetailService = walletDetailService;
+        this.walletDao = walletDao;
         this.walletRecordDao = walletRecordDao;
     }
 
@@ -107,13 +99,14 @@ public class WalletServiceImpl implements IWalletService {
             walletRecord(walletDO, walletRecordDTO);
             walletDetailRecord(walletRecordDTO.getOwnRole(), walletDO.getId(), walletRecordDTO.getSubRecords());
             uniqueWalletRecordService.insert(walletRecordDTO);
+            throw new RuntimeException();
         } finally {
             distributedLockService.unlock(lockKey);
         }
     }
 
     /**
-     * 钱包表变化
+     * 钱包表变化、钱包子记录生成
      *
      * @param walletDO        钱包
      * @param walletRecordDTO 记录
@@ -206,22 +199,6 @@ public class WalletServiceImpl implements IWalletService {
         }
         log.info("钱包详情记录后：{}", walletDetailBaseDO);
         walletDetailService.update(ownRole, walletDetailBaseDO);
-    }
-
-    /**
-     * 钱包子记录
-     *
-     * @param walletRecordDTO
-     * @param balanceTotal
-     * @param balanceUsable
-     * @param balanceFrozen
-     */
-    private void walletSubRecord(WalletRecordDTO walletRecordDTO, BigDecimal balanceTotal, BigDecimal balanceUsable, BigDecimal balanceFrozen) {
-
-        for (WalletSubRecordDTO subRecord : walletRecordDTO.getSubRecords()) {
-
-
-        }
     }
 
     /**

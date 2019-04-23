@@ -26,4 +26,9 @@ public class PayAssetMessageQueueNames {
      * 钱包记录消息队列
      */
     public static final String QUEUE_WALLET_RECORD = QUEUE_PREFIX + "walletRecord";
+
+    /**
+     * 交易结算消息队列
+     */
+    public static final String QUEUE_TRADE_CHECK = QUEUE_PREFIX + "tradeCheck";
 }

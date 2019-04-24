@@ -34,3 +34,8 @@ wallet:
   record:
     ##wallet record 缩写
     serial-number-prefix: WR
+
+check:
+  trade:
+    ##定时任务处理待结算交易数量
+    task-handle-count: 500

@@ -2,6 +2,7 @@ package com.pay.asset.core.rabbit;
 
 import com.alibaba.fastjson.JSONObject;
 import com.pay.asset.client.constants.PayAssetMessageQueueNames;
+import com.pay.asset.client.dto.async.CheckTradeMessageDTO;
 import com.pay.asset.client.dto.async.TradeStatisticsMessageDTO;
 import com.pay.asset.client.dto.async.WalletRecordMessageDTO;
 import com.pay.asset.core.service.IWalletService;
@@ -57,4 +58,26 @@ public class RabbitMqReceiver {
         }
     }
 
+    @RabbitListener(queues = PayAssetMessageQueueNames.QUEUE_CHECK_TRADE_CREATE)
+    public void checkTradeCreate(String content) {
+        try {
+            log.info("收到结算交易创建消息：{}", content);
+            //todo 结算交易创建消息
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("结算交易创建消息处理异常，消息内容:{}，异常：{}", content, e.getMessage());
+        }
+    }
+
+    @RabbitListener(queues = PayAssetMessageQueueNames.QUEUE_CHECK_TRADE)
+    public void checkTrade(String content) {
+        try {
+            log.info("收到结算交易消息：{}", content);
+            CheckTradeMessageDTO checkTradeMessageDTO = JSONObject.toJavaObject(JSONObject.parseObject(content), CheckTradeMessageDTO.class);
+            //todo 处理结算交易消息
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("结算交易消息处理异常，消息内容:{}，异常：{}", content, e.getMessage());
+        }
+    }
 }

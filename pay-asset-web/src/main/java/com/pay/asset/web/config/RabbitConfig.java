@@ -3,6 +3,7 @@ package com.pay.asset.web.config;
 
 import com.pay.asset.client.constants.PayAssetMessageQueueNames;
 import org.springframework.amqp.core.Queue;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -46,12 +47,22 @@ public class RabbitConfig {
     }
 
     /**
-     * 交易结算队列
+     * 结算交易队列
      *
      * @return
      */
     @Bean
-    public Queue tradeCheckQueue() {
-        return new Queue(PayAssetMessageQueueNames.QUEUE_TRADE_CHECK);
+    public Queue checkTradeQueue() {
+        return new Queue(PayAssetMessageQueueNames.QUEUE_CHECK_TRADE);
+    }
+
+    /**
+     * 结算交易创建队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue checkTradeCreateQueue() {
+        return new Queue(PayAssetMessageQueueNames.QUEUE_CHECK_TRADE_CREATE);
     }
 }

@@ -30,5 +30,10 @@ public class PayAssetMessageQueueNames {
     /**
      * 交易结算消息队列
      */
-    public static final String QUEUE_TRADE_CHECK = QUEUE_PREFIX + "tradeCheck";
+    public static final String QUEUE_CHECK_TRADE = QUEUE_PREFIX + "checkTrade";
+
+    /**
+     * 新增结算交易消息队列
+     */
+    public static final String QUEUE_CHECK_TRADE_CREATE = QUEUE_PREFIX + "checkTradeCreate";
 }

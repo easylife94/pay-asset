@@ -57,4 +57,14 @@ public class RabbitMqReceiver {
         }
     }
 
+    @RabbitListener(queues = PayAssetMessageQueueNames.QUEUE_TRADE_CHECK)
+    public void tradeCheck(String content){
+        try{
+
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("交易结算处理异常");
+        }
+    }
+
 }

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pay.asset.core.dao.CheckTradeDao">
+    <resultMap id="BaseResultMap" type="com.pay.asset.client.model.CheckTradeDO">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_update" jdbcType="TIMESTAMP" property="gmtUpdate"/>
+        <result column="is_deleted" jdbcType="BIT" property="isDeleted"/>
+
+        <result column="sys_order_number" jdbcType="VARCHAR" property="sysOrderNumber"/>
+        <result column="trade_amount" jdbcType="DECIMAL" property="tradeAmount"/>
+        <result column="check_date" jdbcType="TIMESTAMP" property="checkDate"/>
+        <result column="check_status" jdbcType="VARCHAR" property="checkStatus"/>
+        <result column="check_method" jdbcType="VARCHAR" property="checkMethod"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        ,
+        gmt_create,
+        gmt_update,
+        is_deleted,
+        sys_order_number,
+        trade_amount,
+        check_date,
+        check_status,
+        check_method
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from check_trade
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from check_trade
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.pay.asset.client.model.CheckTradeDO">
+        insert into check_trade (id, gmt_create, gmt_update, is_deleted,
+                                 sys_order_number, trade_amount, check_date, check_status, check_method)
+        values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtUpdate,jdbcType=TIMESTAMP},
+                #{isDeleted,jdbcType=BIT},
+                #{sysOrderNumber,jdbcType=VARCHAR},
+                #{tradeAmount,jdbcType=DECIMAL},
+                #{checkDate,jdbcType=TIMESTAMP},
+                #{checkStatus,jdbcType=VARCHAR},
+                #{checkMethod,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.pay.asset.client.model.CheckTradeDO">
+        insert into check_trade
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="gmtCreate != null">
+                gmt_create,
+            </if>
+            <if test="gmtUpdate != null">
+                gmt_update,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+
+            <if test="sysOrderNumber != null">
+                sys_order_number,
+            </if>
+            <if test="tradeAmount != null">
+                trade_amount,
+            </if>
+            <if test="checkDate != null">
+                check_date,
+            </if>
+            <if test="checkStatus != null">
+                check_status,
+            </if>
+            <if test="checkMethod != null">
+                check_method,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="gmtCreate != null">
+                #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtUpdate != null">
+                #{gmtUpdate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=BIT},
+            </if>
+            <if test="sysOrderNumber != null">
+                #{sysOrderNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeAmount != null">
+                #{tradeAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="checkDate != null">
+                #{checkDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="checkStatus != null">
+                #{checkStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="checkMethod != null">
+                #{checkMethod,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.pay.asset.client.model.CheckTradeDO">
+        update check_trade
+        <set>
+            <if test="gmtCreate != null">
+                gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtUpdate != null">
+                gmt_update = #{gmtUpdate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=BIT},
+            </if>
+            <if test="sysOrderNumber != null">
+                sys_order_number = #{sysOrderNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="tradeAmount != null">
+                trade_amount = #{tradeAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="checkDate != null">
+                check_date = #{checkDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="checkStatus != null">
+                check_status = #{checkStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="checkMethod != null">
+                check_method = #{checkMethod,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.pay.asset.client.model.CheckTradeDO">
+        update check_trade
+        set
+            gmt_create       = #{gmtCreate,jdbcType=TIMESTAMP},
+            gmt_update       = #{gmtUpdate,jdbcType=TIMESTAMP},
+            is_deleted       = #{isDeleted,jdbcType=BIT},
+            sys_order_number = #{sysOrderNumber,jdbcType=VARCHAR},
+            trade_amount     = #{tradeAmount,jdbcType=DECIMAL},
+            check_date       = #{checkDate,jdbcType=TIMESTAMP},
+            check_status     = #{checkStatus,jdbcType=VARCHAR},
+            check_method     = #{checkMethod,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateChecking">
+        update check_trade
+        set
+            gmt_update   = now(),
+            check_status = 'CHECKING'
+        where id in(
+            <foreach collection="checkTrades" item="item" index="index" separator=",">
+                #{item.id,jdbcType=BIGINT}
+            </foreach>
+        )
+    </update>
+
+    <select id="selectWaitCheck" resultType="com.pay.asset.client.model.CheckTradeDO">
+        select
+        <include refid="Base_Column_List"/>
+        from check_trade
+        where check_status = 'WAIT'
+        order by check_date
+        limit 0,#{count}
+    </select>
+
+
+    <!--<update id="updateChecking">
+        update check_trade
+        set
+            gmt_update   = now(),
+            check_status = 'CHECKING',
+        where check_status = 'WAIT'
+        order by check_date
+        limit 0,#{count}
+    </update>-->
+</mapper>

@@ -152,6 +152,7 @@ public class WalletServiceImpl implements IWalletService {
                 case UNFROZEN:
                     balanceUsable = balanceUsable.add(subRecord.getAmount());
                     balanceFrozen = balanceFrozen.subtract(subRecord.getAmount());
+                    break;
                 case IN_FROZEN:
                     balanceTotal = balanceTotal.add(subRecord.getAmount());
                     balanceFrozen = balanceFrozen.add(subRecord.getAmount());

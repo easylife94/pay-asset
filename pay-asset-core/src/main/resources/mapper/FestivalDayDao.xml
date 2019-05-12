@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pay.asset.core.dao.FestivalDayDao">
+    <resultMap id="BaseResultMap" type="com.pay.asset.client.model.FestivalDayDO">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_update" jdbcType="TIMESTAMP" property="gmtUpdate"/>
+        <result column="is_deleted" jdbcType="BIT" property="isDeleted"/>
+
+        <result column="festival_date" jdbcType="DATE" property="festivalDate"/>
+        <result column="festival_name" jdbcType="VARCHAR" property="festivalName"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        ,
+        gmt_create,
+        gmt_update,
+        is_deleted,
+        festival_date,
+        festival_name
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from festival_day
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from festival_day
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.pay.asset.client.model.FestivalDayDO">
+        insert into festival_day (id, gmt_create, gmt_update, is_deleted,
+                                  festival_date, festival_name)
+        values (#{id,jdbcType=BIGINT}, #{gmtCreate,jdbcType=TIMESTAMP}, #{gmtUpdate,jdbcType=TIMESTAMP},
+                #{isDeleted,jdbcType=BIT},
+                #{festivalDate,jdbcType=DATE},
+                #{festivalName,jdbcType=VARCHAR}
+    </insert>
+    <insert id="insertSelective" parameterType="com.pay.asset.client.model.FestivalDayDO">
+        insert into festival_day
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="gmtCreate != null">
+                gmt_create,
+            </if>
+            <if test="gmtUpdate != null">
+                gmt_update,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+
+            <if test="festivalDate != null">
+                festival_date,
+            </if>
+            <if test="festivalName != null">
+                festival_name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="gmtCreate != null">
+                #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtUpdate != null">
+                #{gmtUpdate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=BIT},
+            </if>
+            <if test="festivalDate != null">
+                #{festivalDate,jdbcType=DATE},
+            </if>
+            <if test="festivalName != null">
+                #{festivalName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.pay.asset.client.model.CheckTradeDO">
+        update festival_day
+        <set>
+            <if test="gmtCreate != null">
+                gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="gmtUpdate != null">
+                gmt_update = #{gmtUpdate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=BIT},
+            </if>
+            <if test="festivalDate != null">
+                festival_date = #{festivalDate,jdbcType=DATE},
+            </if>
+            <if test="festivalName != null">
+                festival_name = #{festivalName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="countByDate" resultType="java.lang.Integer">
+        select count(*)
+        from festival_day
+        where festival_date = #{date,jdbcType=DATE}
+    </select>
+    <select id="selectByBeginDate" resultType="com.pay.asset.client.model.FestivalDayDO">
+
+    </select>
+
+</mapper>

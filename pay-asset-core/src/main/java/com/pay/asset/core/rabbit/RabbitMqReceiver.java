@@ -2,9 +2,11 @@ package com.pay.asset.core.rabbit;
 
 import com.alibaba.fastjson.JSONObject;
 import com.pay.asset.client.constants.PayAssetMessageQueueNames;
+import com.pay.asset.client.dto.async.CheckTradeCreateMessageDTO;
 import com.pay.asset.client.dto.async.CheckTradeMessageDTO;
 import com.pay.asset.client.dto.async.TradeStatisticsMessageDTO;
 import com.pay.asset.client.dto.async.WalletRecordMessageDTO;
+import com.pay.asset.core.service.ICheckTradeService;
 import com.pay.asset.core.service.IWalletService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -22,10 +24,12 @@ import org.springframework.stereotype.Component;
 public class RabbitMqReceiver {
 
     private final IWalletService walletService;
+    private final ICheckTradeService checkTradeService;
 
     @Autowired
-    public RabbitMqReceiver(IWalletService walletService) {
+    public RabbitMqReceiver(IWalletService walletService, ICheckTradeService checkTradeService) {
         this.walletService = walletService;
+        this.checkTradeService = checkTradeService;
     }
 
     @RabbitListener(queues = PayAssetMessageQueueNames.QUEUE_TRADE_STATISTICS)
@@ -62,7 +66,8 @@ public class RabbitMqReceiver {
     public void checkTradeCreate(String content) {
         try {
             log.info("收到结算交易创建消息：{}", content);
-            //todo 结算交易创建消息
+            CheckTradeCreateMessageDTO checkTradeCreateMessageDTO = JSONObject.toJavaObject(JSONObject.parseObject(content), CheckTradeCreateMessageDTO.class);
+            checkTradeService.createCheckTrade(checkTradeCreateMessageDTO);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("结算交易创建消息处理异常，消息内容:{}，异常：{}", content, e.getMessage());

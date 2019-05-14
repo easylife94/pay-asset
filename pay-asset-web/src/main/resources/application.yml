@@ -15,10 +15,10 @@ spring:
     charset: utf-8
     suffix: .ftl
   ##data
-  data:
-    elasticsearch:
-      #配置es节点信息，逗号分隔，如果没有指定，则启动ClientNode（9200端口是http查询使用的。9300集群使用。这里使用9300.）
-      cluster-nodes: 106.13.2.135:9300
+#  data:
+#    elasticsearch:
+#      #配置es节点信息，逗号分隔，如果没有指定，则启动ClientNode（9200端口是http查询使用的。9300集群使用。这里使用9300.）
+#      cluster-nodes: 106.13.2.135:9300
 mybatis:
   mapper-locations: classpath*:/mapper/*.xml
   configuration:
@@ -28,7 +28,6 @@ mybatis:
     use-generated-keys: true
     ##开启日志打印
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
 feign:
   hystrix:
     enabled: true

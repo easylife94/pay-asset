@@ -12,7 +12,11 @@ import java.io.Serializable;
  */
 @Data
 public class TradeStatisticsMessageDTO implements Serializable {
-
-
     private static final long serialVersionUID = 2061439049769829253L;
+
+    private String sysOrderNumber;
+
+    private Long tradeAmount;
+
+    //todo field
 }

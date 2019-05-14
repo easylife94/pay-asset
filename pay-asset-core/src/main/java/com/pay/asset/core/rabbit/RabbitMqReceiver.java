@@ -1,12 +1,16 @@
 package com.pay.asset.core.rabbit;
 
 import com.alibaba.fastjson.JSONObject;
+import com.pay.asset.client.constants.ElasticsearchIndexEnum;
 import com.pay.asset.client.constants.PayAssetMessageQueueNames;
+import com.pay.asset.client.document.rest.RestDocument;
+import com.pay.asset.client.document.rest.TradeLog;
 import com.pay.asset.client.dto.async.CheckTradeCreateMessageDTO;
 import com.pay.asset.client.dto.async.CheckTradeMessageDTO;
 import com.pay.asset.client.dto.async.TradeStatisticsMessageDTO;
 import com.pay.asset.client.dto.async.WalletRecordMessageDTO;
 import com.pay.asset.core.service.ICheckTradeService;
+import com.pay.asset.core.service.IElasticsearchService;
 import com.pay.asset.core.service.IWalletService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -25,24 +29,23 @@ public class RabbitMqReceiver {
 
     private final IWalletService walletService;
     private final ICheckTradeService checkTradeService;
+    private final IElasticsearchService elasticsearchService;
 
     @Autowired
-    public RabbitMqReceiver(IWalletService walletService, ICheckTradeService checkTradeService) {
+    public RabbitMqReceiver(IWalletService walletService, ICheckTradeService checkTradeService, IElasticsearchService elasticsearchService) {
         this.walletService = walletService;
         this.checkTradeService = checkTradeService;
+        this.elasticsearchService = elasticsearchService;
     }
 
     @RabbitListener(queues = PayAssetMessageQueueNames.QUEUE_TRADE_STATISTICS)
     public void tradeCreate(TradeStatisticsMessageDTO tradeStatisticsMessageDTO) {
         try {
             log.info("收到交易统计消息：{}", tradeStatisticsMessageDTO);
-            //1.商户交易数据统计
-            //1.1小时数据统计
-
-
-            //1.2日数据统计
-            //1.3月数据统计
-            //1.4年数据统计
+            //todo 记录交易日志
+            TradeLog tradeLog = new TradeLog("TEST-" + System.currentTimeMillis(), 1000L, 10L, System.currentTimeMillis(), "TEST-00001", "TEST-00002", "TEST-00003", "TEST-00004", "TEST-00005");
+            RestDocument<TradeLog> document = new RestDocument<>(ElasticsearchIndexEnum.TRADE_LOG.getIndex(), tradeLog);
+            elasticsearchService.index(document);
 
         } catch (Exception e) {
             e.printStackTrace();

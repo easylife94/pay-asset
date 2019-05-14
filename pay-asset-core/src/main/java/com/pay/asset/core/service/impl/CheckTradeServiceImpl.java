@@ -5,8 +5,6 @@ import com.pay.asset.client.model.CheckTradeDO;
 import com.pay.asset.core.dao.CheckTradeDao;
 import com.pay.asset.core.service.ICheckTradeService;
 import com.pay.asset.core.service.ITradeDayService;
-import com.pay.common.client.constants.CheckDayEnum;
-import com.pay.common.client.constants.CheckMethodEnum;
 import com.pay.common.client.constants.CheckStatusEnum;
 import com.pay.common.client.exception.PayException;
 import com.pay.common.core.service.IDistributedLockService;

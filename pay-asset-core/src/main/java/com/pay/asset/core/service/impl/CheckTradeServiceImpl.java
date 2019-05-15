@@ -45,17 +45,18 @@ public class CheckTradeServiceImpl implements ICheckTradeService {
         try {
             distributedLockService.lock(ASYNC_CHECK_TRADE_LOCK);
             log.info("发送结算交易异步消息");
-            //todo 发送结算交易异步消息
             //1.先获取待结算记录
             //2.已发送结算异步消息更新状态为结算中
             List<CheckTradeDO> checkTradeDOs = checkTradeDao.selectWaitCheck(count);
             for(CheckTradeDO c : checkTradeDOs){
+                //todo 发送结算交易异步消息
 
             }
-            int i = checkTradeDao.updateChecking(checkTradeDOs);
-
-            if (i != checkTradeDOs.size()) {
-                throw new PayException("");
+            if(checkTradeDOs.size() > 0){
+                int i = checkTradeDao.updateChecking(checkTradeDOs);
+                if (i != checkTradeDOs.size()) {
+                    throw new PayException("更新结算交易状态为结算中失败");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -13,7 +13,7 @@ public interface IElasticsearchService {
      *
      * @param document
      */
-    void index(Document document);
+    boolean index(Document document);
 
 
 

@@ -18,7 +18,10 @@ public class ElasticsearchServiceTests extends PayAssetWebApplicationTests {
 
     @Test
     public void testIndex() {
-        TradeLog tradeLog = new TradeLog("TEST-" + System.currentTimeMillis(), 1000L, 10L, System.currentTimeMillis(), "TEST-00001", "TEST-00002", "TEST-00003", "TEST-00004", "TEST-00005");
+        TradeLog tradeLog = new TradeLog("TEST-" + System.currentTimeMillis(), 1000L,
+                10L, System.currentTimeMillis(), "WAIT", "TEST-00001",
+                "TEST-00002", "TEST-00003", "TEST-00004", "TEST-00005",
+                "ALI","ALI_NATIVE");
         RestDocument<TradeLog> document = new RestDocument<>("trade-log", tradeLog);
         elasticsearchService.index(document);
     }

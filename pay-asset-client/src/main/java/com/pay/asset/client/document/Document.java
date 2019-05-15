@@ -14,6 +14,11 @@ public abstract class Document {
      */
     private String index;
 
+    /**
+     * 指定唯一id
+     */
+    private String id;
+
     public Document(String index) {
         this.index = index;
     }

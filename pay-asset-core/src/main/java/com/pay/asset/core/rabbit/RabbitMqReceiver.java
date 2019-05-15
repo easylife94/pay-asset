@@ -39,17 +39,25 @@ public class RabbitMqReceiver {
     }
 
     @RabbitListener(queues = PayAssetMessageQueueNames.QUEUE_TRADE_STATISTICS)
-    public void tradeCreate(TradeStatisticsMessageDTO tradeStatisticsMessageDTO) {
+    public void tradeCreate(String content) {
         try {
-            log.info("收到交易统计消息：{}", tradeStatisticsMessageDTO);
-            //todo 记录交易日志
-            TradeLog tradeLog = new TradeLog("TEST-" + System.currentTimeMillis(), 1000L, 10L, System.currentTimeMillis(), "TEST-00001", "TEST-00002", "TEST-00003", "TEST-00004", "TEST-00005");
+            log.info("收到交易统计消息：{}", content);
+            TradeStatisticsMessageDTO tradeStatisticsMessageDTO = JSONObject.toJavaObject(JSONObject.parseObject(content), TradeStatisticsMessageDTO.class);
+            TradeLog tradeLog = new TradeLog(tradeStatisticsMessageDTO.getSysOrderNumber(), tradeStatisticsMessageDTO.getTradeAmount(),
+                    tradeStatisticsMessageDTO.getTradeServiceFee(), tradeStatisticsMessageDTO.getTradeTimestamp(),
+                    tradeStatisticsMessageDTO.getTradeStatus(), tradeStatisticsMessageDTO.getPlatformNumber(),
+                    tradeStatisticsMessageDTO.getChannelNumber(), tradeStatisticsMessageDTO.getAgentNumber(),
+                    tradeStatisticsMessageDTO.getMemberNumber(), tradeStatisticsMessageDTO.getMerchantNumber(),
+                    tradeStatisticsMessageDTO.getDefrayalChannel(), tradeStatisticsMessageDTO.getDefrayalType());
             RestDocument<TradeLog> document = new RestDocument<>(ElasticsearchIndexEnum.TRADE_LOG.getIndex(), tradeLog);
-            elasticsearchService.index(document);
-
+            document.setId(tradeStatisticsMessageDTO.getSysOrderNumber());
+            boolean index = elasticsearchService.index(document);
+            if (!index) {
+                log.error("交易日志记录失败：{}", tradeStatisticsMessageDTO);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("交易创建消息处理异常，消息内容:{}，异常：{}", tradeStatisticsMessageDTO, e.getMessage());
+            log.error("交易统计消息处理异常，消息内容:{}，异常：{}", content, e.getMessage());
         }
     }
 

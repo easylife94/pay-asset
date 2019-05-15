@@ -10,6 +10,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.rest.RestStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,14 +31,22 @@ public class ElasticsearchServiceRestImpl implements IElasticsearchService {
     RestHighLevelClient esRestClient;
 
     @Override
-    public void index(Document document) {
+    public boolean index(Document document) {
         try {
             RestDocument restDocument = (RestDocument) document;
             IndexRequest request = new IndexRequest(document.getIndex());
             request.source(JSONObject.toJSONString(restDocument.getSource()), XContentType.JSON);
+            if(document.getId() != null){
+                request.id(document.getId());
+            }
             IndexResponse response = esRestClient.index(request, RequestOptions.DEFAULT);
+            RestStatus status = response.status();
+            //todo 判断结果状态
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            log.error("索引文档异常，document:{}", document);
+            return false;
         }
     }
 

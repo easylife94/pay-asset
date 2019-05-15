@@ -18,5 +18,24 @@ public class TradeStatisticsMessageDTO implements Serializable {
 
     private Long tradeAmount;
 
-    //todo field
+    private Long tradeServiceFee;
+
+    private Long tradeTimestamp;
+
+    private String platformNumber;
+
+    private String channelNumber;
+
+    private String memberNumber;
+
+    private String agentNumber;
+
+    private String merchantNumber;
+
+    private String tradeStatus;
+
+    private String defrayalChannel;
+
+    private String defrayalType;
+
 }

@@ -17,6 +17,9 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * 消息队列接收器
  *
@@ -43,13 +46,16 @@ public class RabbitMqReceiver {
         try {
             log.info("收到交易统计消息：{}", content);
             TradeStatisticsMessageDTO tradeStatisticsMessageDTO = JSONObject.toJavaObject(JSONObject.parseObject(content), TradeStatisticsMessageDTO.class);
+            Date tradeDate = new Date(tradeStatisticsMessageDTO.getTradeTimestamp());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String tradeDateStr = sdf.format(tradeDate);
             TradeLog tradeLog = new TradeLog(tradeStatisticsMessageDTO.getSysOrderNumber(), tradeStatisticsMessageDTO.getTradeAmount(),
                     tradeStatisticsMessageDTO.getTradeServiceFee(), tradeStatisticsMessageDTO.getTradeTimestamp(),
                     tradeStatisticsMessageDTO.getTradeStatus(), tradeStatisticsMessageDTO.getPlatformNumber(),
                     tradeStatisticsMessageDTO.getChannelNumber(), tradeStatisticsMessageDTO.getAgentNumber(),
                     tradeStatisticsMessageDTO.getMemberNumber(), tradeStatisticsMessageDTO.getMerchantNumber(),
                     tradeStatisticsMessageDTO.getDefrayalChannel(), tradeStatisticsMessageDTO.getDefrayalType(),
-                    tradeStatisticsMessageDTO.getTradeDate());
+                    tradeDateStr);
             RestDocument<TradeLog> document = new RestDocument<>(ElasticsearchIndexEnum.TRADE_LOG.getIndex(), tradeLog);
             document.setId(tradeStatisticsMessageDTO.getSysOrderNumber());
             boolean index = elasticsearchService.index(document);

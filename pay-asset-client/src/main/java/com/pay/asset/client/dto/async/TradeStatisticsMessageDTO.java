@@ -38,6 +38,4 @@ public class TradeStatisticsMessageDTO implements Serializable {
 
     private String defrayalType;
 
-    private String tradeDate;
-
 }

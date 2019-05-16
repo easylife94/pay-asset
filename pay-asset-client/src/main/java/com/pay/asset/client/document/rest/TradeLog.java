@@ -35,10 +35,12 @@ public class TradeLog {
 
     private String defrayalType;
 
+    private String tradeDate;
+
 
     public TradeLog(String sysOrderNumber, Long tradeAmount, Long tradeServiceFee, Long tradeTimestamp, String tradeStatus,
                     String platformNumber, String channelNumber, String agentNumber, String memberNumber, String merchantNumber,
-                    String defrayalChannel,String defrayalType) {
+                    String defrayalChannel,String defrayalType,String tradeDate) {
         this.sysOrderNumber = sysOrderNumber;
         this.tradeAmount = tradeAmount;
         this.tradeServiceFee = tradeServiceFee;
@@ -51,5 +53,6 @@ public class TradeLog {
         this.merchantNumber = merchantNumber;
         this.defrayalChannel = defrayalChannel;
         this.defrayalType = defrayalType;
+        this.tradeDate = tradeDate;
     }
 }

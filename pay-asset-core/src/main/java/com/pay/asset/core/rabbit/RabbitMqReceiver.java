@@ -48,7 +48,8 @@ public class RabbitMqReceiver {
                     tradeStatisticsMessageDTO.getTradeStatus(), tradeStatisticsMessageDTO.getPlatformNumber(),
                     tradeStatisticsMessageDTO.getChannelNumber(), tradeStatisticsMessageDTO.getAgentNumber(),
                     tradeStatisticsMessageDTO.getMemberNumber(), tradeStatisticsMessageDTO.getMerchantNumber(),
-                    tradeStatisticsMessageDTO.getDefrayalChannel(), tradeStatisticsMessageDTO.getDefrayalType());
+                    tradeStatisticsMessageDTO.getDefrayalChannel(), tradeStatisticsMessageDTO.getDefrayalType(),
+                    tradeStatisticsMessageDTO.getTradeDate());
             RestDocument<TradeLog> document = new RestDocument<>(ElasticsearchIndexEnum.TRADE_LOG.getIndex(), tradeLog);
             document.setId(tradeStatisticsMessageDTO.getSysOrderNumber());
             boolean index = elasticsearchService.index(document);

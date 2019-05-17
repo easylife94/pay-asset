@@ -1,8 +1,8 @@
 package com.pay.asset.core.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.pay.asset.client.document.Document;
-import com.pay.asset.client.document.rest.RestDocument;
+import com.pay.asset.client.document.BaseDocument;
+import com.pay.asset.client.document.rest.RestBaseDocument;
 import com.pay.asset.core.service.IElasticsearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
@@ -31,9 +31,9 @@ public class ElasticsearchServiceRestImpl implements IElasticsearchService {
     RestHighLevelClient esRestClient;
 
     @Override
-    public boolean index(Document document) {
+    public boolean index(BaseDocument document) {
         try {
-            RestDocument restDocument = (RestDocument) document;
+            RestBaseDocument restDocument = (RestBaseDocument) document;
             IndexRequest request = new IndexRequest(document.getIndex());
             request.source(JSONObject.toJSONString(restDocument.getSource()), XContentType.JSON);
             if(document.getId() != null){

@@ -1,6 +1,6 @@
 package com.pay.asset.core.service;
 
-import com.pay.asset.client.document.Document;
+import com.pay.asset.client.document.BaseDocument;
 
 /**
  * @author chenwei
@@ -12,8 +12,9 @@ public interface IElasticsearchService {
      * 索引文档
      *
      * @param document
+     * @return
      */
-    boolean index(Document document);
+    boolean index(BaseDocument document);
 
 
 

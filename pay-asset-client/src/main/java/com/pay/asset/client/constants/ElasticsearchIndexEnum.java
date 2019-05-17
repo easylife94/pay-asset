@@ -6,6 +6,9 @@ package com.pay.asset.client.constants;
  */
 public enum ElasticsearchIndexEnum {
 
+    /**
+     * 交易日志索引
+     */
     TRADE_LOG("trade_log"),
     ;
 

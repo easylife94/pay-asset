@@ -7,7 +7,7 @@ import lombok.Data;
  * @date 2019/5/14 10:51
  */
 @Data
-public abstract class Document {
+public abstract class BaseDocument {
 
     /**
      * 必须小写
@@ -19,7 +19,7 @@ public abstract class Document {
      */
     private String id;
 
-    public Document(String index) {
+    public BaseDocument(String index) {
         this.index = index;
     }
 }

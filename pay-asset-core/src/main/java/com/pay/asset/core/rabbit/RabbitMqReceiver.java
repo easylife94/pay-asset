@@ -3,7 +3,7 @@ package com.pay.asset.core.rabbit;
 import com.alibaba.fastjson.JSONObject;
 import com.pay.asset.client.constants.ElasticsearchIndexEnum;
 import com.pay.asset.client.constants.PayAssetMessageQueueNames;
-import com.pay.asset.client.document.rest.RestDocument;
+import com.pay.asset.client.document.rest.RestBaseDocument;
 import com.pay.asset.client.document.rest.TradeLog;
 import com.pay.asset.client.dto.async.CheckTradeCreateMessageDTO;
 import com.pay.asset.client.dto.async.CheckTradeMessageDTO;
@@ -56,7 +56,7 @@ public class RabbitMqReceiver {
                     tradeStatisticsMessageDTO.getMemberNumber(), tradeStatisticsMessageDTO.getMerchantNumber(),
                     tradeStatisticsMessageDTO.getDefrayalChannel(), tradeStatisticsMessageDTO.getDefrayalType(),
                     tradeDateStr);
-            RestDocument<TradeLog> document = new RestDocument<>(ElasticsearchIndexEnum.TRADE_LOG.getIndex(), tradeLog);
+            RestBaseDocument<TradeLog> document = new RestBaseDocument<>(ElasticsearchIndexEnum.TRADE_LOG.getIndex(), tradeLog);
             document.setId(tradeStatisticsMessageDTO.getSysOrderNumber());
             boolean index = elasticsearchService.index(document);
             if (!index) {
